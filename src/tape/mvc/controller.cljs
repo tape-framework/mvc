@@ -8,16 +8,17 @@
 
 ;;; Helpers
 
-(defn- kval-ex [k kval]
+(defn- kval-ex [id k kval]
   (ex-info (str k " val must be true or a qualified keyword, but is " kval)
-           {k kval}))
+           {:id id
+            k kval}))
 
 (defn- get-id [kind id handler]
   (let [kval (some-> handler meta kind)]
     (cond
       (qualified-keyword? kval) kval
-      (true? kval) id
-      :else (kval-ex kind kval))))
+      (or (true? kval) (nil? kval)) id
+      :else (throw (kval-ex id kind kval)))))
 
 ;;; Reg-Fn
 

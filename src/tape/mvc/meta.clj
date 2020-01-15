@@ -7,9 +7,10 @@
   [ns-pred ns-sym]
   (->> ns-sym api/find-ns :name meta (filter ns-pred) (into {})))
 
-(defn- kval-ex [k kval]
+(defn- kval-ex [id k kval]
   (ex-info (str k " val must be true or a qualified keyword, but is " kval)
-           {k kval}))
+           {:id id
+            k kval}))
 
 (defn ->kw-fn
   "Given the namespace string `ns-str`, extra metadata `m`, metadata key `k`
@@ -20,8 +21,8 @@
         kval     (-> var-info :meta k)
         event-kw (cond
                    (qualified-keyword? kval) kval
-                   (true? kval) (keyword ns-str sym-name)
-                   :else (throw (kval-ex k kval)))
+                   (or (true? kval) (nil? kval)) (keyword ns-str sym-name)
+                   :else (throw (kval-ex sym-name k kval)))
         fn-sym   (symbol sym-name)
         m'       (merge (:meta var-info) m)]
     [event-kw `(with-meta ~fn-sym ~m')]))
@@ -37,8 +38,8 @@
         input    (-> var-info :meta reg-key)
         event-kw (cond
                    (qualified-keyword? kval) kval
-                   (true? kval) (keyword ns-str sym-name)
-                   :else (throw (kval-ex k kval)))
+                   (or (true? kval) (nil? kval)) (keyword ns-str sym-name)
+                   :else (throw (kval-ex sym-name k kval)))
         fn-sym   (symbol sym-name)
         val      (if input [input fn-sym] fn-sym)
         m'       (merge (:meta var-info) m)]
