@@ -2,7 +2,7 @@
   (:require [cljs.test :refer [deftest is are]]
             [integrant.core :as ig]
             [re-frame.registrar :as registrar]
-            [tape.module :as module]
+            [tape.module :as module :include-macros true]
             [tape.mvc.controller :as c]
             [tape.mvc.view :as v]
             [tape.mvc.app.input.controller :as input.c]))
