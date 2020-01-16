@@ -6,8 +6,9 @@ STATUS: Pre-alpha, in design and prototyping phase.
 
 `tape.mvc`
 
-IOC/DI dressing of Re-Frame & Reagent by means of
-[Integrant](https://github.com/weavejester/integrant) and `tape.module`.
+[IOC](https://en.wikipedia.org/wiki/Inversion_of_control)/[DI](https://en.wikipedia.org/wiki/Dependency_injection)
+dressing of [Re-Frame](https://github.com/day8/re-frame/) & [Reagent](https://reagent-project.github.io/)
+by means of [Integrant](https://github.com/weavejester/integrant) and `tape.module`.
 
 #### Usage
 
