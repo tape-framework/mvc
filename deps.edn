@@ -1,3 +1,3 @@
-{:deps {re-frame    {:mvn/version "0.10.6"}
+{:deps {re-frame    {:mvn/version "0.10.9"}
         tape/refmap {:local/root "../refmap"}
         tape/module {:local/root "../module"}}}
