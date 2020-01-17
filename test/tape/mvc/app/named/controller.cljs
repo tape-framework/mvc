@@ -8,4 +8,7 @@
 (defn ^{::c/event-db ::event-db-named} event-db [_db [_ev-id _params]] {::x "x"})
 (defn ^{::c/event-fx ::event-fx-named} event-fx [_cofx [_ev-id _params]] {:db {::x "X"}})
 
+;; name clash test
+(defn ^::c/event-fx fx-named [_ [_]] {})
+
 (c/defmodule)

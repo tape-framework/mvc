@@ -7,22 +7,13 @@
   [ns-pred ns-sym]
   (->> ns-sym api/find-ns :name meta (filter ns-pred) (into {})))
 
-(defn- kval-ex [id k kval]
-  (ex-info (str k " val must be true or a qualified keyword, but is " kval)
-           {:id id
-            k kval}))
-
 (defn ->kw-fn
   "Given the namespace string `ns-str`, extra metadata `m`, metadata key `k`
   and the `var-info` of a var, returns a pair `[event-kw fn-sym]` to be used
   in registration."
-  [ns-str m k var-info]
+  [ns-str m var-info]
   (let [sym-name (-> var-info :name name)
-        kval     (-> var-info :meta k)
-        event-kw (cond
-                   (qualified-keyword? kval) kval
-                   (or (true? kval) (nil? kval)) (keyword ns-str sym-name)
-                   :else (throw (kval-ex sym-name k kval)))
+        event-kw (keyword ns-str sym-name)
         fn-sym   (symbol sym-name)
         m'       (merge (:meta var-info) m)]
     [event-kw `(with-meta ~fn-sym ~m')]))
@@ -32,14 +23,10 @@
   and the `var-info` of a var, returns a pair `[event-kw val]` to be used in
   registration, where `val` is either a `fn-sym` or a vector of extra input
   and `fn-sym`."
-  [reg-key ns-str m k var-info]
+  [reg-key ns-str m var-info]
   (let [sym-name (-> var-info :name name)
-        kval     (-> var-info :meta k)
         input    (-> var-info :meta reg-key)
-        event-kw (cond
-                   (qualified-keyword? kval) kval
-                   (or (true? kval) (nil? kval)) (keyword ns-str sym-name)
-                   :else (throw (kval-ex sym-name k kval)))
+        event-kw (keyword ns-str sym-name)
         fn-sym   (symbol sym-name)
         val      (if input [input fn-sym] fn-sym)
         m'       (merge (:meta var-info) m)]
@@ -58,7 +45,7 @@
   [ns-meta var-infos m k ->pair]
   (let [add-nsp-meta' (partial add-nsp-meta ns-meta)
         pred          (partial has-meta? k)
-        ->pair'       (partial ->pair m k)]
+        ->pair'       (partial ->pair m)]
     (->> var-infos (map add-nsp-meta') (filter pred) (map ->pair') (into {}))))
 
 (defn ->derive

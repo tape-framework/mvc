@@ -19,10 +19,10 @@
         var-info2 {:name 'baz :meta {::c/sub :foo.bar/qux}}]
     (is (= [:foo.bar/baz '(clojure.core/with-meta baz {::c/signal signal
                                                        ::c/sub    true})]
-           (meta/->kw-fn "foo.bar" m ::c/sub var-info)))
+           (meta/->kw-fn "foo.bar" m var-info)))
     (is (= [:foo.bar/qux '(clojure.core/with-meta baz {::c/signal signal
                                                        ::c/sub    :foo.bar/qux})]
-           (meta/->kw-fn "foo.bar" m ::c/sub var-info2)))))
+           (meta/->kw-fn "foo.bar" m var-info2)))))
 
 (deftest ->kw-reg-test
   (let [m         {:x :a}
@@ -34,11 +34,11 @@
     (is (= [:foo.bar/baz '(clojure.core/with-meta
                            [signal baz]
                            {:x :a, ::c/signal signal, ::c/sub true})]
-           (meta/->kw-reg ::c/signal "foo.bar" m ::c/sub var-info)))
+           (meta/->kw-reg ::c/signal "foo.bar" m var-info)))
     (is (= [:foo.bar/qux '(clojure.core/with-meta
                            [signal baz]
                            {:x :a, ::c/signal signal, ::c/sub :foo.bar/qux})]
-           (meta/->kw-reg ::c/signal "foo.bar" m ::c/sub var-info2)))))
+           (meta/->kw-reg ::c/signal "foo.bar" m var-info2)))))
 
 (deftest collect-test
   (let [ns-meta   {:x :a}

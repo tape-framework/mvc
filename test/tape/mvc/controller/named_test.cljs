@@ -11,30 +11,33 @@
 
 (deftest derive-test
   (are [x y] (isa? x y)
-    ::named.c/sub-named ::c/sub
-    ::named.c/sub-raw-named ::c/sub-raw
-    ::named.c/fx-named ::c/fx
-    ::named.c/cofx-named ::c/cofx
-    ::named.c/event-db-named ::c/event-db
-    ::named.c/event-fx-named ::c/event-fx))
+    ::named.c/sub ::c/sub
+    ::named.c/sub-raw ::c/sub-raw
+    ::named.c/fx ::c/fx
+    ::named.c/cofx ::c/cofx
+    ::named.c/event-db ::c/event-db
+    ::named.c/event-fx ::c/event-fx
+    ::named.c/fx-named ::c/event-fx))
 
 (deftest module-test
   (let [f    (ig/init-key ::named.c/module nil)
         conf (f {})]
-    (is (= #{::named.c/sub-named
-             ::named.c/sub-raw-named
-             ::named.c/fx-named
-             ::named.c/cofx-named
-             ::named.c/event-db-named
-             ::named.c/event-fx-named}
+    (is (= #{::named.c/sub
+             ::named.c/sub-raw
+             ::named.c/fx
+             ::named.c/cofx
+             ::named.c/event-db
+             ::named.c/event-fx
+             ::named.c/fx-named}
            (set (keys conf))))
     (are [f mf] (= f (.-afn mf))
-      named.c/sub (::named.c/sub-named conf)
-      named.c/sub-raw (::named.c/sub-raw-named conf)
-      named.c/fx (::named.c/fx-named conf)
-      named.c/cofx (::named.c/cofx-named conf)
-      named.c/event-db (::named.c/event-db-named conf)
-      named.c/event-fx (::named.c/event-fx-named conf))))
+      named.c/sub (::named.c/sub conf)
+      named.c/sub-raw (::named.c/sub-raw conf)
+      named.c/fx (::named.c/fx conf)
+      named.c/cofx (::named.c/cofx conf)
+      named.c/event-db (::named.c/event-db conf)
+      named.c/event-fx (::named.c/event-fx conf)
+      named.c/fx-named (::named.c/fx-named conf))))
 
 (def ^:private config
   {::c/module       nil
@@ -49,5 +52,6 @@
       :fx ::named.c/fx-named
       :cofx ::named.c/cofx-named
       :event ::named.c/event-db-named
-      :event ::named.c/event-fx-named)
+      :event ::named.c/event-fx-named
+      :event ::named.c/fx-named)
     (ig/halt! system)))
