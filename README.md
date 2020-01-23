@@ -59,7 +59,6 @@ little to no business logic for that UI piece.
 
 The **controller** namespaces contain functions that can be registered in
 Re-Frame. Each fn that is to be registered is annotated with one of:
-
 - `::c/sub` **subscription**
 - `::c/sub-raw` raw subscription
 - `::c/fx` effect handler
@@ -69,14 +68,14 @@ Re-Frame. Each fn that is to be registered is annotated with one of:
 
 To provide interceptors to event handlers, or signals to subscriptions, use the
 following metadata:
-
 - `::c/interceptors` vector of symbols that evaluate to interceptors in the
   current namespace
 - `::c/signal` symbol that evaluates to a signal in the current namespace
 
 Metadata at the namespace level is added to the functions that are registered,
-and can be used to add interceptors to all event handlers in a namespace, or a
-signal to all subscriptions in the namespace.
+and can be used to:
+- add interceptors to all event handlers in a namespace,
+- or a signal to all subscriptions in the namespace.
 
 ```cljs
 (ns blog.app.greet.controller
