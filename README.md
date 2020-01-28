@@ -77,7 +77,7 @@ and can be used to:
 - add interceptors to all event handlers in a namespace,
 - or a signal to all subscriptions in the namespace.
 
-```cljs
+```clojure
 (ns blog.app.greet.controller
   (:require [tape.mvc.controller :as c :include-macros true]))
 
@@ -94,14 +94,14 @@ There is a `(c/defmodule)` call at the end that inspects the current namespace
 and defines a `tape.module` that will have the functions be registered in
 Re-Frame. It is equivalent to:
 
-```cljs
+```clojure
 (derive ::hello ::c/event-db)
 (derive ::say ::c/sub)
 
-(defmethod integrant.core/init-key ::module [_ _]
+(defmethod ig/init-key ::module [_ _]
   (fn [config]
-    (tape.module/merge-configs config {::hello hello
-                                       ::say say})))
+    (module/merge-configs config {::hello hello
+                                  ::say say})))
 ```
 
 ##### Views
@@ -115,7 +115,7 @@ The key in the map will be based off the controller namespace, as to match an
 event (see naming conventions below) that can result in the view being set as
 current `{::greet.c/hello greet.v/hello}`.
 
-```cljs
+```clojure
 (ns blog.app.greet.view
   (:require [re-frame.core :as rf]
             [tape.mvc.view :as v :include-macros true]
@@ -134,12 +134,14 @@ functions be registered in the views registry map. Note the argument that must
 be an unquoted symbol of the corresponding controller namespace, in full. It is
 equivalent to:
                                                                           
-```cljs
+```clojure
 (derive ::hello ::v/view)
 
-(defmethod integrant.core/init-key ::module [_ _]
+(defmethod ig/init-key ::module [_ _]
   (fn [config]
-    (tape.module/merge-configs config {::hello hello})))
+    (module/merge-configs
+     config
+     {::hello ^{::v/controller-ns-str "blog.app.greet.controller"} hello})))
 ```
 
 ##### Modules system
@@ -158,7 +160,7 @@ In `resources/blog/config.edn` declare your modules that will
 In `src/blog/core.cljs` you `tape.module/read-config` and
 `tape.module/exec-config` your Integrant system:
 
-```cljs
+```clojure
 (ns tape.blog
   (:require
     [goog.dom]

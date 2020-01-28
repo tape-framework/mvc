@@ -11,7 +11,7 @@
   to their metadata declaration, and defines a module that adds them to the
   system config map. Example:
 
-  ```cljs
+  ```clojure
   (ns blog.app.greet.controller
     (:require [tape.mvc.controller :as c :include-macros true]))
 
@@ -26,7 +26,7 @@
 
   The `defmodule` call above is equivalent to:
 
-  ```cljs
+  ```clojure
   (derive ::hello ::c/event-db)
   (derive ::say ::c/sub)
 

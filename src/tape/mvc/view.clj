@@ -11,7 +11,7 @@
   a symbol, derives the views according to their metadata declaration and
   declares a module that adds them to the system config map. Example:
 
-  ```cljs
+  ```clojure
   (ns blog.app.greet.view
     (:require [re-frame.core :as rf]
               [tape.mvc.view :as v :include-macros true]
@@ -26,7 +26,7 @@
 
   The `defmodule` call above is equivalent to:
 
-  ```cljs
+  ```clojure
   (derive ::hello ::v/view)
 
   (defmethod integrant.core/init-key ::module [_ _]
