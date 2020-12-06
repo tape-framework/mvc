@@ -1,3 +1,5 @@
-{:deps {re-frame    {}
-        tape/refmap {:local/root "../refmap"}
-        tape/module {:local/root "../module"}}}
+{:deps    {re-frame/re-frame {}
+           tape/refmap       {:local/root "../refmap"}
+           tape/module       {:local/root "../module"}}
+ :aliases {:test {:extra-paths ["test" "target"]
+                  :extra-deps  {tape/dev {:local/root "../dev"}}}}}
