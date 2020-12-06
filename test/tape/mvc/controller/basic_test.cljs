@@ -1,11 +1,12 @@
 (ns tape.mvc.controller.basic-test
-  (:require [cljs.test :refer [deftest is are]]
+  (:require [cljs.test :refer [deftest is are run-tests]]
             [integrant.core :as ig]
             [re-frame.registrar :as registrar]
             [tape.module :as module :include-macros true]
             [tape.mvc.controller.reg-fn :as reg-fn]
             [tape.mvc.controller :as c]
             [tape.mvc.view :as v]
+            [tape.mvc :as mvc]
             [tape.mvc.app.basic.controller :as basic.c]
             [tape.mvc.app.basic.view :as basic.v]
             [clojure.set :as set]))
@@ -49,11 +50,12 @@
                        ::reg-fn  (ig/ref ::context)}
    ::c/module         nil
    ::v/module         nil
+   ::mvc/module       nil
    ::basic.c/module   nil
    ::basic.v/module   nil})
 
 (deftest reg-test
-  (let [system (-> config module/prep-config ig/init)]
+  (let [system (-> config module/prep-config (ig/init [:tape.mvc/main :tape/multi]))]
     (is (set/subset? #{::c/reg-fns
                        ::c/subs
                        ::c/subs-raw
