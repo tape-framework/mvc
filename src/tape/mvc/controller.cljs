@@ -25,11 +25,11 @@
 ;; Naming `reg-afn` because: "Namespace c.reg-fn clashes with var c/reg-fn".
 (defn- reg-afn [[id handler]]
   (let [id' (get-id ::reg-fn id handler)]
-    (reg-fn/reg-fn! id' handler)))
+    (reg-fn/reg-fn! id' handler)
+    [id' handler]))
 
 (defmethod ig/init-key ::reg-fns [_ reg-fns]
-  (run! reg-afn reg-fns)
-  reg-fns)
+  (into {} (map reg-afn reg-fns)))
 
 ;;; Subscriptions
 
@@ -38,13 +38,13 @@
     (cond
       (fn? handler-or-args) (rf/reg-sub id' handler-or-args)
       (coll? handler-or-args) (apply rf/reg-sub id' handler-or-args)
-      :else (throw (ex-info "Bad argument" {})))))
+      :else (throw (ex-info "Bad argument" {})))
+    [id' handler-or-args]))
 
 (defn- clear-sub [[id _]] (rf/clear-sub id))
 
 (defmethod ig/init-key ::subs [_ subs]
-  (run! reg-sub subs)
-  subs)
+  (into {} (map reg-sub subs)))
 
 (defmethod ig/halt-key! ::subs [_ subs]
   (run! clear-sub subs)
@@ -55,11 +55,11 @@
 
 (defn- reg-sub-raw [[id handler]]
   (let [id' (get-id ::sub-raw id handler)]
-    (rf/reg-sub-raw id' handler)))
+    (rf/reg-sub-raw id' handler)
+    [id' handler]))
 
 (defmethod ig/init-key ::subs-raw [_ subs-raw]
-  (run! reg-sub-raw subs-raw)
-  subs-raw)
+  (into {} (map reg-sub-raw subs-raw)))
 
 (defmethod ig/halt-key! ::subs-raw [_ subs-raw]
   (run! clear-sub subs-raw)
@@ -70,13 +70,13 @@
 
 (defn- reg-fx [[id handler]]
   (let [id' (get-id ::fx id handler)]
-    (rf/reg-fx id' handler)))
+    (rf/reg-fx id' handler)
+    [id' handler]))
 
 (defn- clear-fx [[id _]] (rf/clear-fx id))
 
 (defmethod ig/init-key ::fxs [_ fxs]
-  (run! reg-fx fxs)
-  fxs)
+  (into {} (map reg-fx fxs)))
 
 (defmethod ig/halt-key! ::fxs [_ fxs]
   (run! clear-fx fxs)
@@ -86,13 +86,13 @@
 
 (defn- reg-cofx [[id handler]]
   (let [id' (get-id ::cofx id handler)]
-    (rf/reg-cofx id' handler)))
+    (rf/reg-cofx id' handler)
+    [id' handler]))
 
 (defn- clear-cofx [[id _]] (rf/clear-cofx id))
 
 (defmethod ig/init-key ::cofxs [_ cofxs]
-  (run! reg-cofx cofxs)
-  cofxs)
+  (into {} (map reg-cofx cofxs)))
 
 (defmethod ig/halt-key! ::cofxs [_ cofxs]
   (run! clear-cofx cofxs)
@@ -119,15 +119,15 @@
         handler      (get-handler handler-or-args)
         interceptors (cond-> (get-interceptors handler-or-args)
                              has-view? (conj interceptor))]
-    (rf/reg-event-fx id' interceptors handler)))
+    (rf/reg-event-fx id' interceptors handler)
+    [id' handler-or-args]))
 
 (defn- clear-event [[id _]] (rf/clear-event id))
 
 (defmethod ig/init-key ::events-fx
   [_ {:keys [events-fx] :as config}]
   (let [reg-event-fx' (partial reg-event-fx config)]
-    (run! reg-event-fx' events-fx))
-  events-fx)
+    (into {} (map reg-event-fx' events-fx))))
 
 (defmethod ig/halt-key! ::events-fx [_ {:keys [events-fx]}]
   (run! clear-event events-fx))
@@ -141,13 +141,13 @@
         handler      (get-handler handler-or-args)
         interceptors (cond-> (get-interceptors handler-or-args)
                              has-view? (conj interceptor))]
-    (rf/reg-event-db id' interceptors handler)))
+    (rf/reg-event-db id' interceptors handler)
+    [id' handler-or-args]))
 
 (defmethod ig/init-key ::events-db
   [_ {:keys [events-db] :as config}]
   (let [reg-event-db' (partial reg-event-db config)]
-    (run! reg-event-db' events-db))
-  events-db)
+    (into {} (map reg-event-db' events-db))))
 
 (defmethod ig/halt-key! ::events-db [_ {:keys [events-db]}]
   (run! clear-event events-db))
