@@ -18,13 +18,13 @@
 ;;; Reg-ables
 
 (defn sub
-  {::c/sub    true
-   ::c/signal signal}
+  {::c/sub     true
+   ::c/signals [signal]}
   [db _query] (::x db))
 
 (defn subn
-  {::c/sub    ::sub-named
-   ::c/signal signal}
+  {::c/sub     ::sub-named
+   ::c/signals [signal]}
   [app-db _] (::x @app-db))
 
 (defn event-db

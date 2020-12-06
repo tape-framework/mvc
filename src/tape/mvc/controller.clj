@@ -45,7 +45,7 @@
 
         collect'      (partial meta/collect ns-meta' var-infos {})
         ->kw-fn'      (partial meta/->kw-fn ns-str)
-        ->kw-sub-reg' (partial meta/->kw-reg ::signal ns-str)
+        ->kw-sub-reg' (partial meta/->kw-reg ::signals ns-str)
         ->kw-ev-reg'  (partial meta/->kw-reg ::interceptors ns-str)
 
         subs          (collect' ::sub ->kw-sub-reg')

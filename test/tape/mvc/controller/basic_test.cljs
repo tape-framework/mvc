@@ -1,5 +1,5 @@
 (ns tape.mvc.controller.basic-test
-  (:require [cljs.test :refer [deftest is are run-tests]]
+  (:require [cljs.test :refer [deftest is are]]
             [integrant.core :as ig]
             [re-frame.registrar :as registrar]
             [tape.module :as module :include-macros true]

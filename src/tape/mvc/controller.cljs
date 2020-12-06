@@ -20,6 +20,12 @@
       (or (true? kval) (nil? kval)) id
       :else (throw (kval-ex id kind kval)))))
 
+(defn- get-handler [handler-or-args]
+  (cond
+    (fn? handler-or-args) handler-or-args
+    (coll? handler-or-args) (second handler-or-args)
+    :else (throw (ex-info "Bad argument" {}))))
+
 ;;; Reg-Fn
 
 ;; Naming `reg-afn` because: "Namespace c.reg-fn clashes with var c/reg-fn".
@@ -33,12 +39,16 @@
 
 ;;; Subscriptions
 
+(defn- get-signals [handler-or-args]
+  (cond-> []
+          (coll? handler-or-args) (concat (first handler-or-args))))
+
 (defn- reg-sub [[id handler-or-args]]
-  (let [id' (get-id ::sub id handler-or-args)]
-    (cond
-      (fn? handler-or-args) (rf/reg-sub id' handler-or-args)
-      (coll? handler-or-args) (apply rf/reg-sub id' handler-or-args)
-      :else (throw (ex-info "Bad argument" {})))
+  (let [id'     (get-id ::sub id handler-or-args)
+        handler (get-handler handler-or-args)
+        signals (get-signals handler-or-args)
+        args (conj (into [id'] signals) handler)]
+    (apply rf/reg-sub args)
     [id' handler-or-args]))
 
 (defn- clear-sub [[id _]] (rf/clear-sub id))
@@ -99,12 +109,6 @@
   cofxs)
 
 ;;; Events Helpers
-
-(defn- get-handler [handler-or-args]
-  (cond
-    (fn? handler-or-args) handler-or-args
-    (coll? handler-or-args) (second handler-or-args)
-    :else (throw (ex-info "Bad argument" {}))))
 
 (defn- get-interceptors [handler-or-args]
   (cond-> []
