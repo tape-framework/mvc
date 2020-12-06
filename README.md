@@ -104,6 +104,8 @@ Re-Frame. It is equivalent to:
                                   ::say say})))
 ```
 
+Derived keys are collected by `tape.refmap` and registered in Re-Frame.
+
 ##### Views
 
 The **view** namespace contains Reagent functions. Some can be registered in the
@@ -143,6 +145,8 @@ equivalent to:
      config
      {::hello ^{::v/controller-ns-str "blog.app.greet.controller"} hello})))
 ```
+
+Derived keys are collected by `tape.refmap` and registered in the view registry.
 
 ##### Modules system
 
