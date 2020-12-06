@@ -6,14 +6,14 @@ STATUS: Pre-alpha, in design and prototyping phase.
 
 `tape.mvc`
 
-[IOC](https://en.wikipedia.org/wiki/Inversion_of_control)/[DI](https://en.wikipedia.org/wiki/Dependency_injection)
-dressing of [Re-Frame](https://github.com/day8/re-frame/) & [Reagent](https://reagent-project.github.io/)
-by means of [Integrant](https://github.com/weavejester/integrant) and `tape.module`.
+An alternative interface to [Re-Frame](https://github.com/day8/re-frame/) 
+(and [Reagent](https://reagent-project.github.io/)) - via an
+[Integrant](https://github.com/weavejester/integrant) system built out of a
+`tape.module` system ([ported](https://github.com/duct-framework/core/) from Duct Framework).
 
 #### Usage
 
-You must be familiar with [Reagent](https://reagent-project.github.io/) &
-[Re-Frame](https://github.com/day8/re-frame), Integrant, `tape.refmap` &
+You must be familiar with Reagent, Re-Frame, Integrant, `tape.refmap` &
 `tape.module` before proceeding.
 
 ##### Install
