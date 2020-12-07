@@ -1,5 +1,13 @@
 (ns tape.mvc.meta
-  (:require [cljs.analyzer.api :as api]))
+  (:require [cljs.env :as env]
+            [cljs.analyzer :as ana]
+            [cljs.analyzer.api :as api]))
+
+(defn- add-meta-flag [aname]
+  (with-meta aname (assoc (meta aname) :tape.mvc/module! true)))
+
+(defn flag-ns-meta! [ns-sym]
+  (swap! env/*compiler* update-in [::ana/namespaces ns-sym :name] add-meta-flag))
 
 (defn ns-meta
   "Returns a map of meta data on the namespace `ns-sym` who'se pairs obey the

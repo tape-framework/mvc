@@ -1,6 +1,8 @@
 (ns tape.mvc.app.basic.controller
   (:require [tape.mvc.controller :as c :include-macros true]))
 
+(def routes ["/" ::home])
+
 (defn ^::c/sub sub [db _query] (::x db))
 (defn ^::c/sub-raw sub-raw [app-db _] (::x @app-db))
 (defn ^::c/fx fx [_m] (do "x"))

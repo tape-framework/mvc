@@ -3,6 +3,8 @@
             [re-frame.core :as rf]
             [tape.mvc.controller :as c :include-macros true]))
 
+(def routes ["/foo" ::foo])
+
 ;;; Input
 
 (def interceptor

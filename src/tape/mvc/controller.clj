@@ -64,7 +64,7 @@
 
         derives       (concat subsd subs-rawd fxsd cofxsd events-fxd events-dbd)
         config        (merge subs subs-raw fxs cofxs events-fx events-db)]
-
+    (meta/flag-ns-meta! ns-sym)
     `(do ~@derives
          (defmethod ig/init-key ~module [_k# _v#]
            (fn [config#]

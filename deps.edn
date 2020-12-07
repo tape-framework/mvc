@@ -1,4 +1,5 @@
 {:deps    {re-frame/re-frame {}
+           me.raynes/fs      {}
            tape/refmap       {:local/root "../refmap"}
            tape/module       {:local/root "../module"}}
  :aliases {:test {:extra-paths ["test" "target"]
