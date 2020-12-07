@@ -62,11 +62,18 @@
        (filter routes?)
        (mapv #(symbol % "routes"))))
 
-(defmacro require-modules [app-path]
+(defmacro require-modules
+  "Discover modules under `app-path` and require them. Use form at top level.
+  Example: `(mvc/require-modules \"src/blog/app\")`."
+  [app-path]
   (let [files (views-and-controllers app-path)]
     `(do ~@(requires files))))
 
-(defmacro modules-discovery [app-path]
+(defmacro modules-discovery
+  "Returns a map with modules and routes discovered under `app-path`: modules to be merged in modules config map and
+  routes to be used as input in the router. Use after `require-modules` or after modules have been loaded. Example:
+  `(mvc/modules-discovery \"src/blog/app\")`."
+  [app-path]
   (let [modules (filter module? (views-and-controllers app-path))]
     `{:modules ~(modules-map modules)
       :routes  ~(routes modules)}))
