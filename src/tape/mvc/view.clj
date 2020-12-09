@@ -48,7 +48,7 @@
 
         views     (collect' ::view ->kw-fn')
         viewsd    (map (meta/->derive ::view) views)]
-    (meta/flag-ns-meta! ns-sym)
+
     `(do ~@viewsd
          (defmethod ig/init-key ~module [_k# _v#]
            (fn [config#]

@@ -1,7 +1,6 @@
 (ns tape.mvc
   "Modules discovery for less verbose config."
-  (:require [cljs.analyzer.api :as api]
-            [me.raynes.fs :as fs])
+  (:require [me.raynes.fs :as fs])
   (:import [java.io File]))
 
 (defn- cljs? [f]
@@ -24,19 +23,15 @@
     (subs path subtract-count (count path))))
 
 (defn- path-ns-str [path]
-  (.. (.replaceAll (str path) "\\.cljs" "")
+  (.. (.replaceAll (str path) "\\.clj(s|c)" "")
       (replace \_ \-)
       (replace \/ \.)))
 
 (defn- view-or-controller? [s]
-  (re-matches #"(.*?)(\.view|\.controller)$" s))
-
-(defn- module? [s]
-  ;; Marked by tape.mvc.meta/flag-ns-meta! called from defmodule
-  (some-> s symbol api/find-ns :name meta :tape.mvc/module!))
+  (re-matches #"(.*?)(view|controller)$" s))
 
 (defn- controller? [s]
-  (re-matches #"(.*?)(\.controller)$" s))
+  (re-matches #"(.*?)(controller)$" s))
 
 (defn- requires [modules]
   (map #(list 'require (list 'quote (symbol %))) modules))
@@ -52,14 +47,9 @@
                    (repeat nil))
        (apply hash-map)))
 
-(defn- routes? [controller]
-  ;; asumes modules already required/loaded
-  (get (api/ns-publics (symbol controller)) 'routes))
-
 (defn- routes [modules]
   (->> modules
        (filter controller?)
-       (filter routes?)
        (mapv #(symbol % "routes"))))
 
 (defmacro require-modules
@@ -74,6 +64,6 @@
   routes to be used as input in the router. Use after `require-modules` or after modules have been loaded. Example:
   `(mvc/modules-discovery \"src/blog/app\")`."
   [app-path]
-  (let [modules (filter module? (views-and-controllers app-path))]
+  (let [modules (views-and-controllers app-path)]
     `{:modules ~(modules-map modules)
       :routes  ~(routes modules)}))
