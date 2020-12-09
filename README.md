@@ -70,7 +70,7 @@ To provide interceptors to event handlers, or signals to subscriptions, use the
 following metadata:
 - `::c/interceptors` vector of symbols that evaluate to interceptors in the
   current namespace
-- `::c/signal` symbol that evaluates to a signal in the current namespace
+- `::c/signals` vector of symbols that evaluate to signals in the current namespace
 
 Metadata at the namespace level is added to the functions that are registered,
 and can be used to:
