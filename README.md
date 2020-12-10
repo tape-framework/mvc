@@ -39,7 +39,7 @@ blog
         ├── core.cljs
         └── app
             ├── layouts
-            │   └── view.cljs
+            │   └── app.cljs
             ├── users
             │   └── ...
             └── posts
@@ -49,8 +49,8 @@ blog
 ```
 
 Under `blog.app` you should have a package for each piece of your UI (users, 
-posts, layouts). Each of these will have a model, view and controller namespace
-(not necessarily all 3).
+posts). Each of these will have a model, view and controller namespace (not 
+necessarily all 3).
 
 The **model** is a normal namespace, and is likely to be missing if you have
 little to no business logic for that UI piece.
