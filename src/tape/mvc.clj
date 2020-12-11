@@ -61,8 +61,7 @@
 
 (defmacro modules-discovery
   "Returns a map with modules and routes discovered under `app-path`: modules to be merged in modules config map and
-  routes to be used as input in the router. Use after `require-modules` or after modules have been loaded. Example:
-  `(mvc/modules-discovery \"src/blog/app\")`."
+  routes to be used as input in the router. Example: `(mvc/modules-discovery \"src/blog/app\")`."
   [app-path]
   (let [modules (views-and-controllers app-path)]
     `{:modules ~(modules-map modules)
