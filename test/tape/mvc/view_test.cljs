@@ -3,11 +3,25 @@
             [integrant.core :as ig]
             [re-frame.core :as rf]
             [tape.module :as module :include-macros true]
-            [tape.mvc.view :as v]
+            [tape.mvc.view :as v :include-macros true]
             [tape.mvc.app.basic.controller :as basic.c]
             [tape.mvc.app.basic.view :as basic.v]))
 
 (module/load-hierarchy)
+
+;;; Ergonomics
+
+(deftest dispatch-test
+  (with-redefs [rf/dispatch identity]
+    (is (= [::basic.c/event-db]
+           (v/dispatch [basic.c/event-db])))))
+
+(deftest subscribe-test
+  (with-redefs [rf/subscribe identity]
+    (is (= [::basic.c/sub]
+           (v/subscribe [basic.c/sub])))))
+
+;;; Module
 
 (def ^:private views {::basic.c/event-db basic.v/hello})
 
