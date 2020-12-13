@@ -217,6 +217,19 @@ The current view is automatically set in app-db by an interceptor if not set
 already from the event handler, if there exists a view corresponding to the
 event, per the naming convention.
 
+#### Ergonomic API
+
+To allow IDE navigation, we have two macros that proxy to Re-Frame:
+
+```clojure
+(v/dispatch [posts.c/index]) ;; => (rf/dispatch [::posts.c/index])
+(v/subscribe [posts.c/posts]) ;; => (rf/subscribe [::posts.c/posts])
+```
+
+In their use, the macros accept events with a symbol form (that can be
+navigated via IDE), but once compiled, they are in the standard Re-Frame API
+with no performance penalty.
+
 #### License
 
 Copyright © 2019 clyfe
