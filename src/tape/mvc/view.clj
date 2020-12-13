@@ -7,7 +7,7 @@
 
 ;;; Ergonomics
 
-(defn- event-kw
+(defn event-kw
   "Given a namespace qualified symbol of a tape event handler, returns the
   corresponding event keyword."
   [env fsym]
@@ -28,7 +28,7 @@
   [[fsym & args]]
   `(re-frame.core/dispatch ~(into [(event-kw &env fsym)] args)))
 
-(defn- sub-kw
+(defn sub-kw
   "Given a namespace qualified symbol of a tape subscription, returns the
   corresponding sumscription keyword."
   [env fsym]
