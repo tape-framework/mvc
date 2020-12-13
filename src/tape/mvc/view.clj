@@ -7,43 +7,20 @@
 
 ;;; Ergonomics
 
-(defn event-kw
-  "Given a namespace qualified symbol of a tape event handler, returns the
-  corresponding event keyword."
-  [env fsym]
-  (let [{:keys [ns name] ::c/keys [event-db event-fx]} (api/resolve env fsym)
-        event (->> [event-db event-fx]
-                   (filter qualified-keyword?)
-                   first)]
-    (cond
-      (qualified-keyword? event) event
-      (qualified-symbol? name) (keyword name)
-      :else (keyword (str ns) (str name)))))
-
 (defmacro dispatch
   "Like `re-frame.core/dispatch` but with  an IDE navigable symbol instead a
   keyword. When compiled it replaces the symbol with the keyword. Example:
   `(v/dispatch [counter.c/increment])
   ; => (rf/subscribe [::counter.c/increment])`."
   [[fsym & args]]
-  `(re-frame.core/dispatch ~(into [(event-kw &env fsym)] args)))
-
-(defn sub-kw
-  "Given a namespace qualified symbol of a tape subscription, returns the
-  corresponding sumscription keyword."
-  [env fsym]
-  (let [{:keys [ns name] ::keys [sub]} (api/resolve env fsym)]
-    (cond
-      (qualified-keyword? sub) sub
-      (qualified-symbol? name) (keyword name)
-      :else (keyword (str ns) (str name)))))
+  `(re-frame.core/dispatch ~(into [(meta/event-kw &env fsym)] args)))
 
 (defmacro subscribe
   "Like `re-frame.core/subscribe` but with  an IDE navigable symbol instead a
   keyword. When compiled it replaces the symbol with the keyword. Example:
   `(v/subscribe [counter.c/count]) ; => (rf/subscribe [::counter.c/count])`."
   [[fsym & args]]
-  `(re-frame.core/subscribe ~(into [(sub-kw &env fsym)] args)))
+  `(re-frame.core/subscribe ~(into [(meta/sub-kw &env fsym)] args)))
 
 ;;; Module
 

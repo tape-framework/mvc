@@ -1,7 +1,38 @@
 (ns tape.mvc.meta
+  "Various helpers for operations based on Tape MVC specific metadata
+  annotations."
   (:require [cljs.env :as env]
             [cljs.analyzer :as ana]
             [cljs.analyzer.api :as api]))
+
+;;; Ergonomics
+
+(defn event-kw
+  "Given a namespace qualified symbol of a tape event handler, returns the
+  corresponding event keyword. Call from macro. Example:
+  `(meta/event-kw &env 'counter.c/increment) ; => ::counter.c/increment`."
+  [env fsym]
+  (let [{:keys [ns name] ::c/keys [event-db event-fx]} (api/resolve env fsym)
+        event (->> [event-db event-fx]
+                   (filter qualified-keyword?)
+                   first)]
+    (cond
+      (qualified-keyword? event) event
+      (qualified-symbol? name) (keyword name)
+      :else (keyword (str ns) (str name)))))
+
+(defn sub-kw
+  "Given a namespace qualified symbol of a tape subscription, returns the
+  corresponding sumscription keyword. Call from macro. Example:
+  `(meta/sub-kw &env 'counter.c/count) ; => ::counter.c/count`."
+  [env fsym]
+  (let [{:keys [ns name] ::keys [sub]} (api/resolve env fsym)]
+    (cond
+      (qualified-keyword? sub) sub
+      (qualified-symbol? name) (keyword name)
+      :else (keyword (str ns) (str name)))))
+
+;;; Module
 
 (defn ns-meta
   "Returns a map of meta data on the namespace `ns-sym` who'se pairs obey the
