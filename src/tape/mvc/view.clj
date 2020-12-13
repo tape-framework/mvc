@@ -2,8 +2,7 @@
   (:require [cljs.analyzer.api :as api]
             [integrant.core :as ig]
             [tape.module :as module]
-            [tape.mvc.meta :as meta]
-            [tape.mvc.controller :as c]))
+            [tape.mvc.meta :as meta]))
 
 ;;; Ergonomics
 

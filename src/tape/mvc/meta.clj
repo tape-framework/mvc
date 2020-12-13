@@ -12,7 +12,7 @@
   corresponding event keyword. Call from macro. Example:
   `(meta/event-kw &env 'counter.c/increment) ; => ::counter.c/increment`."
   [env fsym]
-  (let [{:keys [ns name] ::c/keys [event-db event-fx]} (api/resolve env fsym)
+  (let [{:keys [ns name] :tape.mvc.controller/keys [event-db event-fx]} (api/resolve env fsym)
         event (->> [event-db event-fx]
                    (filter qualified-keyword?)
                    first)]
