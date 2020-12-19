@@ -228,7 +228,8 @@ To allow IDE navigation, we have two macros that proxy to Re-Frame:
 
 In their use, the macros accept events with a symbol form (that can be
 navigated via IDE), but once compiled, they are in the standard Re-Frame API
-with no performance penalty.
+with no performance penalty. Added vaue: the handler existance is checked at
+compile time, and typos are avoided.
 
 #### License
 
