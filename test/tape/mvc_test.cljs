@@ -12,7 +12,9 @@
 (mvc/require-modules "test/tape/mvc/app/")
 
 (deftest modules-discovery-test
-  (is (= {:routes [["/" :tape.mvc.app.basic.controller/home]
+  (is (= {:routes [["/" :tape.mvc.app.basic.controller/home
+                    "/event-db" :tape.mvc.app.basic.controller/event-db]
+                   nil
                    ["/foo" :tape.mvc.app.input.controller/foo]]
           :modules {:tape.mvc.app.named.controller/module nil
                     :tape.mvc.app.input.controller/module nil
