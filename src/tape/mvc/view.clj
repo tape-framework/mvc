@@ -2,7 +2,8 @@
   (:require [cljs.analyzer.api :as api]
             [integrant.core :as ig]
             [tape.module :as module]
-            [tape.mvc.meta :as meta]))
+            [tape.mvc.meta :as meta]
+            [clojure.string :as string]))
 
 ;;; Ergonomics
 
@@ -25,10 +26,14 @@
 
 (defn- view-ns? [[k _]] (= "tape.mvc.view" (namespace k)))
 
+(defn- controller-ns-str [view-ns-str]
+  (assert (re-find #".view$" view-ns-str) "Namespace must end in \".view\"!")
+  (string/replace view-ns-str #".view$" ".controller"))
+
 (defmacro defmodule
-  "Called at the end of view namespaces with a controller namespace argument as
-  a symbol, derives the views according to their metadata declaration and
-  declares a module that adds them to the system config map. Example:
+  "Called at the end of view namespaces. Derives the views according to their
+  metadata declaration and declares a module that adds them to the system
+  config map. Example:
 
   ```clojure
   (ns blog.app.greet.view
@@ -40,7 +45,7 @@
     (let [say @(rf/subscribe [::greet.c/say])]
       [:p say]))
 
-  (v/defmodule blog.app.greet.controller)
+  (v/defmodule) ;; blog.app.greet.controller ns must exist
   ```
 
   The `defmodule` call above is equivalent to:
@@ -53,15 +58,15 @@
       (tape.module/merge-configs config {::hello hello})))
   ```
   "
-  [controller-ns]
-  {:pre [(symbol? controller-ns)]}
+  []
   (let [ns-str    (str *ns*)
+        co-ns-str (controller-ns-str ns-str)
         ns-sym    (symbol ns-str)
         ns-meta   (meta/ns-meta view-ns? ns-sym)
         module    (keyword ns-str "module")
         var-infos (vals (api/ns-publics ns-sym))
 
-        m         {::controller-ns-str (str controller-ns)}
+        m         {::controller-ns-str co-ns-str}
         collect   (partial meta/collect ns-meta var-infos m)
         ->kw-var  (partial meta/->kw-var ns-str)
 

@@ -127,14 +127,13 @@ current `{::greet.c/hello greet.v/hello}`.
   (let [say @(rf/subscribe [::greet.c/say])]
     [:p say]))
 
-(v/defmodule blog.app.greet.controller)
+(v/defmodule) ;; blog.app.greet.controller must exist
 ```
 
-There is a `(v/defmodule blog.app.greet.controller)` call at the end that 
-inspects the current namespace and defines a `tape.module` that will have the 
-functions be registered in the views registry map. Note the argument that must
-be an unquoted symbol of the corresponding controller namespace, in full. It is
-equivalent to:
+There is a `(v/defmodule)` call at the end that inspects the current namespace
+and defines a `tape.module` that will have the functions be registered in the
+views registry map. Note the argument that must be an unquoted symbol of the
+corresponding controller namespace, in full. It is equivalent to:
                                                                           
 ```clojure
 (derive ::hello ::v/view)
@@ -179,18 +178,12 @@ In `src/blog/core.cljs` you `tape.module/read-config` and
 (module/load-hierarchy)
 (def config (module/read-config "tape/blog/config.edn"))
 (defonce system nil)
-
-(defn app []
-  [:div @(rf/subscribe [::v/current-fn])])
-
-(defn mount []
-  (when-let [el (goog.dom/getElement "app")]
-    (r/render-component [app] el)))
+(defn app [] [:div @(rf/subscribe [::v/current-fn])])
 
 (defn -main []
   (set! system (-> config module/prep-config ig/init))
   (rf/dispatch-sync [::greet.c/hello])
-  (mount))
+  (r/render-component [app] (goog.dom/getElement "app")))
 ```
 
 ##### Conventions

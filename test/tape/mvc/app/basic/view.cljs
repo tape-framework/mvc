@@ -11,4 +11,4 @@
   (let [shout @(rf/subscribe [::baisc.c/shout])]
     [:h1 shout]))
 
-(v/defmodule tape.mvc.app.baisc.controller)
+(v/defmodule)
