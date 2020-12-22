@@ -3,8 +3,7 @@
   (:require [integrant.core :as ig]
             [re-frame.core :as rf]
             [tape.refmap :as refmap]
-            [tape.module :as module]
-            [tape.mvc.controller.reg-fn :as reg-fn]))
+            [tape.module :as module]))
 
 ;;; Helpers
 
@@ -25,17 +24,6 @@
     (fn? handler-or-args) handler-or-args
     (coll? handler-or-args) (second handler-or-args)
     :else (throw (ex-info "Bad argument" {}))))
-
-;;; Reg-Fn
-
-;; Naming `reg-afn` because: "Namespace c.reg-fn clashes with var c/reg-fn".
-(defn- reg-afn [[id handler]]
-  (let [id' (get-id ::reg-fn id handler)]
-    (reg-fn/reg-fn! id' handler)
-    [id' handler]))
-
-(defmethod ig/init-key ::reg-fns [_ {:keys [reg-fns]}]
-  (into {} (map reg-afn reg-fns)))
 
 ;;; Subscriptions
 
@@ -201,8 +189,6 @@
 
 (def ^:private default-config
   {::frame     nil
-   ::reg-fns   {:frame   (ig/ref ::frame)
-                :reg-fns (refmap/refmap ::reg-fn)}
    ::subs      {:frame (ig/ref ::frame)
                 :subs  (refmap/refmap ::sub)}
    ::subs-raw  {:frame    (ig/ref ::frame)

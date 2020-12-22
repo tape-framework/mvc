@@ -13,8 +13,7 @@
 (defmethod ig/init-key ::module [_ _]
   (fn [config]
     (module/merge-configs
-     config {::main {:reg-fns     (ig/ref ::c/reg-fns)
-                     :subs        (ig/ref ::c/subs)
+     config {::main {:subs        (ig/ref ::c/subs)
                      :subs-raw    (ig/ref ::c/subs-raw)
                      :fxs         (ig/ref ::c/fxs)
                      :cofxs       (ig/ref ::c/cofxs)

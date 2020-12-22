@@ -3,7 +3,6 @@
             [integrant.core :as ig]
             [re-frame.registrar :as registrar]
             [tape.module :as module :include-macros true]
-            [tape.mvc.controller.reg-fn :as reg-fn]
             [tape.mvc.controller :as c]
             [tape.mvc.view :as v]
             [tape.mvc :as mvc]
@@ -41,13 +40,9 @@
       basic.c/event-fx (::basic.c/event-fx conf))))
 
 (derive ::context :tape/const)
-(derive ::reg-fn ::c/reg-fn)
-(defmethod ig/init-key ::reg-fn [_k context]
-  (fn [x] (+ x context)))
 
 (def ^:private config
-  {:tape.profile/base {::context 42
-                       ::reg-fn  (ig/ref ::context)}
+  {:tape.profile/base {::context 42}
    ::c/module         nil
    ::v/module         nil
    ::mvc/module       nil
@@ -56,15 +51,13 @@
 
 (deftest reg-test
   (let [system (-> config module/prep-config (ig/init [:tape.mvc/main :tape/multi]))]
-    (is (set/subset? #{::c/reg-fns
-                       ::c/subs
+    (is (set/subset? #{::c/subs
                        ::c/subs-raw
                        ::c/fxs
                        ::c/cofxs
                        ::c/events-db
                        ::c/events-fx}
                      (set (keys system))))
-    (is (= 47 (reg-fn/subscribe [::reg-fn 5])))
     (are [kind id] (some? (registrar/get-handler kind id))
       :sub ::basic.c/sub
       :sub ::basic.c/sub-raw

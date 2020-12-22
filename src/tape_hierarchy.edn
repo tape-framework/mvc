@@ -1,7 +1,5 @@
 {:tape/multi [:tape/const]
 
- :tape.mvc.controller/reg-fn [:tape/const :tape/multi]
-
  :tape.mvc.controller/sub [:tape/const :tape/multi]
  :tape.mvc.controller/sub-raw [:tape/const :tape/multi]
  :tape.mvc.controller/fx [:tape/const :tape/multi]
