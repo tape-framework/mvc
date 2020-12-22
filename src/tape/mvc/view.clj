@@ -57,15 +57,15 @@
   {:pre [(symbol? controller-ns)]}
   (let [ns-str    (str *ns*)
         ns-sym    (symbol ns-str)
-        ns-meta'  (meta/ns-meta view-ns? ns-sym)
+        ns-meta   (meta/ns-meta view-ns? ns-sym)
         module    (keyword ns-str "module")
         var-infos (vals (api/ns-publics ns-sym))
 
         m         {::controller-ns-str (str controller-ns)}
-        collect'  (partial meta/collect ns-meta' var-infos m)
-        ->kw-fn'  (partial meta/->kw-fn ns-str)
+        collect   (partial meta/collect ns-meta var-infos m)
+        ->kw-var  (partial meta/->kw-var ns-str)
 
-        views     (collect' ::view ->kw-fn')
+        views     (collect ::view ->kw-var)
         viewsd    (map (meta/->derive ::view) views)]
 
     `(do ~@viewsd

@@ -3,7 +3,8 @@
             [re-frame.core :as rf]
             [tape.mvc.controller :as c :include-macros true]))
 
-(def routes ["/foo" ::foo])
+(def ^::c/routes routes
+  ["/foo" ::foo])
 
 ;;; Input
 

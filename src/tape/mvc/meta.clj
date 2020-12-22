@@ -40,28 +40,27 @@
   [ns-pred ns-sym]
   (->> ns-sym api/find-ns :name meta (filter ns-pred) (into {})))
 
-(defn ->kw-fn
-  "Given the namespace string `ns-str`, extra metadata `m`, metadata key `k`
-  and the `var-info` of a var, returns a pair `[event-kw fn-sym]` to be used
-  in registration."
+(defn ->kw-var
+  "Given the namespace string `ns-str`, extra metadata `m`, and the `var-info`
+  of a var, returns a pair `[event-kw var-sym]` to be used in registration."
   [ns-str m var-info]
   (let [sym-name (-> var-info :name name)
         event-kw (keyword ns-str sym-name)
-        fn-sym   (symbol sym-name)
+        var-sym  (symbol sym-name)
         m'       (merge (:meta var-info) m)]
-    [event-kw `(with-meta ~fn-sym ~m')]))
+    [event-kw `(with-meta ~var-sym ~m')]))
 
 (defn ->kw-reg
-  "Given the namespace string `ns-str`, extra metadata `m`, metadata key `k`
-  and the `var-info` of a var, returns a pair `[event-kw val]` to be used in
-  registration, where `val` is either a `fn-sym` or a vector of extra input
-  and `fn-sym`."
+  "Given the metadata key `reg-key`, namespace string `ns-str`, extra metadata
+  `m` and the `var-info` of a var, returns a pair `[event-kw val]` to be used
+  in registration, where `val` is either a `var-sym` or a vector of extra input
+  and `var-sym`."
   [reg-key ns-str m var-info]
   (let [sym-name (-> var-info :name name)
         input    (-> var-info :meta reg-key)
         event-kw (keyword ns-str sym-name)
-        fn-sym   (symbol sym-name)
-        val      (if input [input fn-sym] fn-sym)
+        var-sym  (symbol sym-name)
+        val      (if input [input var-sym] var-sym)
         m'       (merge (:meta var-info) m)]
     [event-kw `(with-meta ~val ~m')]))
 

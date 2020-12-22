@@ -42,16 +42,6 @@
          (map (comp path-ns-str subtract-src' #(.getPath %)))
          (filter view-or-controller?))))
 
-(defn- modules-map [modules]
-  (->> (interleave (map #(keyword % "module") modules)
-                   (repeat nil))
-       (apply hash-map)))
-
-(defn- routes [modules]
-  (->> modules
-       (filter controller?)
-       (mapv #(symbol % "routes"))))
-
 (defmacro require-modules
   "Discover modules under `app-path` and require them. Use form at top level.
   Example: `(mvc/require-modules \"src/blog/app\")`."
@@ -59,10 +49,10 @@
   (let [files (views-and-controllers app-path)]
     `(do ~@(requires files))))
 
-(defmacro modules-discovery
-  "Returns a map with modules and routes discovered under `app-path`: modules to be merged in modules config map and
-  routes to be used as input in the router. Example: `(mvc/modules-discovery \"src/blog/app\")`."
+(defmacro modules-map
+  "Returns a map with modules discovered under `app-path` to be merged in
+  modules config map. Example: `(mvc/modules-map \"src/blog/app\")`."
   [app-path]
-  (let [modules (views-and-controllers app-path)]
-    `{:modules ~(modules-map modules)
-      :routes  ~(routes modules)}))
+  (let [modules (views-and-controllers app-path)
+        modules-kw (map #(keyword % "module") modules)]
+    (apply hash-map (interleave modules-kw (repeat nil)))))

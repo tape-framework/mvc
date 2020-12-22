@@ -37,33 +37,35 @@
   ```
   "
   []
-  (let [ns-str        (str *ns*)
-        ns-sym        (symbol ns-str)
-        ns-meta'      (meta/ns-meta controller-ns? ns-sym)
-        module        (keyword ns-str "module")
-        var-infos     (vals (api/ns-publics ns-sym))
+  (let [ns-str       (str *ns*)
+        ns-sym       (symbol ns-str)
+        ns-meta      (meta/ns-meta controller-ns? ns-sym)
+        module       (keyword ns-str "module")
+        var-infos    (vals (api/ns-publics ns-sym))
 
-        collect'      (partial meta/collect ns-meta' var-infos {})
-        ->kw-fn'      (partial meta/->kw-fn ns-str)
-        ->kw-sub-reg' (partial meta/->kw-reg ::signals ns-str)
-        ->kw-ev-reg'  (partial meta/->kw-reg ::interceptors ns-str)
+        collect      (partial meta/collect ns-meta var-infos {})
+        ->kw-var     (partial meta/->kw-var ns-str)
+        ->kw-sub-reg (partial meta/->kw-reg ::signals ns-str)
+        ->kw-ev-reg  (partial meta/->kw-reg ::interceptors ns-str)
 
-        subs          (collect' ::sub ->kw-sub-reg')
-        subs-raw      (collect' ::sub-raw ->kw-fn')
-        fxs           (collect' ::fx ->kw-fn')
-        cofxs         (collect' ::cofx ->kw-fn')
-        events-fx     (collect' ::event-fx ->kw-ev-reg')
-        events-db     (collect' ::event-db ->kw-ev-reg')
+        routes       (collect ::routes ->kw-var)
+        subs         (collect ::sub ->kw-sub-reg)
+        subs-raw     (collect ::sub-raw ->kw-var)
+        fxs          (collect ::fx ->kw-var)
+        cofxs        (collect ::cofx ->kw-var)
+        events-fx    (collect ::event-fx ->kw-ev-reg)
+        events-db    (collect ::event-db ->kw-ev-reg)
 
-        subsd         (map (meta/->derive ::sub) subs)
-        subs-rawd     (map (meta/->derive ::sub-raw) subs-raw)
-        fxsd          (map (meta/->derive ::fx) fxs)
-        cofxsd        (map (meta/->derive ::cofx) cofxs)
-        events-fxd    (map (meta/->derive ::event-fx) events-fx)
-        events-dbd    (map (meta/->derive ::event-db) events-db)
+        routesd      (map (meta/->derive ::routes) routes)
+        subsd        (map (meta/->derive ::sub) subs)
+        subs-rawd    (map (meta/->derive ::sub-raw) subs-raw)
+        fxsd         (map (meta/->derive ::fx) fxs)
+        cofxsd       (map (meta/->derive ::cofx) cofxs)
+        events-fxd   (map (meta/->derive ::event-fx) events-fx)
+        events-dbd   (map (meta/->derive ::event-db) events-db)
 
-        derives       (concat subsd subs-rawd fxsd cofxsd events-fxd events-dbd)
-        config        (merge subs subs-raw fxs cofxs events-fx events-db)]
+        derives      (concat routesd subsd subs-rawd fxsd cofxsd events-fxd events-dbd)
+        config       (merge routes subs subs-raw fxs cofxs events-fx events-db)]
 
     `(do ~@derives
          (defmethod ig/init-key ~module [_k# _v#]

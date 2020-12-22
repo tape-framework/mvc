@@ -14,6 +14,7 @@
 
 (deftest derive-test
   (are [x y] (isa? x y)
+    ::basic.c/routes ::c/routes
     ::basic.c/sub ::c/sub
     ::basic.c/sub-raw ::c/sub-raw
     ::basic.c/fx ::c/fx
@@ -24,13 +25,15 @@
 (deftest module-test
   (let [f    (ig/init-key ::basic.c/module nil)
         conf (f {})]
-    (is (= #{::basic.c/sub
+    (is (= #{::basic.c/routes
+             ::basic.c/sub
              ::basic.c/sub-raw
              ::basic.c/fx
              ::basic.c/cofx
              ::basic.c/event-db
              ::basic.c/event-fx}
            (set (keys conf))))
+    (is (= basic.c/routes (::basic.c/routes conf)))
     (are [f mf] (= f (.-afn mf))
       basic.c/sub (::basic.c/sub conf)
       basic.c/sub-raw (::basic.c/sub-raw conf)
@@ -42,8 +45,7 @@
 (derive ::context :tape/const)
 
 (def ^:private config
-  {:tape.profile/base {::context 42}
-   ::c/module         nil
+  {::c/module         nil
    ::v/module         nil
    ::mvc/module       nil
    ::basic.c/module   nil

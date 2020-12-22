@@ -11,6 +11,7 @@
 
 (deftest derive-test
   (are [x y] (isa? x y)
+    ::input.c/routes ::c/routes
     ::input.c/sub ::c/sub
     ::input.c/subn ::c/sub
     ::input.c/event-db ::c/event-db
@@ -19,7 +20,8 @@
 (deftest module-test
   (let [f    (ig/init-key ::input.c/module nil)
         conf (f {})]
-    (is (= #{::input.c/sub
+    (is (= #{::input.c/routes
+             ::input.c/sub
              ::input.c/subn
              ::input.c/event-db
              ::input.c/event-fx}
