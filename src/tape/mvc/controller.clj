@@ -45,16 +45,14 @@
 
         collect      (partial meta/collect ns-meta var-infos {})
         ->kw-var     (partial meta/->kw-var ns-str)
-        ->kw-sub-reg (partial meta/->kw-reg ::signals ns-str)
-        ->kw-ev-reg  (partial meta/->kw-reg ::interceptors ns-str)
 
         routes       (collect ::routes ->kw-var)
-        subs         (collect ::sub ->kw-sub-reg)
+        subs         (collect ::sub ->kw-var)
         subs-raw     (collect ::sub-raw ->kw-var)
         fxs          (collect ::fx ->kw-var)
         cofxs        (collect ::cofx ->kw-var)
-        events-fx    (collect ::event-fx ->kw-ev-reg)
-        events-db    (collect ::event-db ->kw-ev-reg)
+        events-fx    (collect ::event-fx ->kw-var)
+        events-db    (collect ::event-db ->kw-var)
 
         routesd      (map (meta/->derive ::routes) routes)
         subsd        (map (meta/->derive ::sub) subs)

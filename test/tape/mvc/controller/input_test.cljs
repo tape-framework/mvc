@@ -18,7 +18,7 @@
     ::input.c/event-fx ::c/event-fx))
 
 (deftest module-test
-  (let [f    (ig/init-key ::input.c/module nil)
+  (let [f (ig/init-key ::input.c/module nil)
         conf (f {})]
     (is (= #{::input.c/routes
              ::input.c/sub
@@ -26,15 +26,16 @@
              ::input.c/event-db
              ::input.c/event-fx}
            (set (keys conf))))
-    (are [v mv] (= v mv)
+    (are [v mv] (= v [(-> mv meta ::c/signals) (.-afn mv)])
       [[input.c/signal] input.c/sub] (::input.c/sub conf)
-      [[input.c/signal] input.c/subn] (::input.c/subn conf)
+      [[input.c/signal] input.c/subn] (::input.c/subn conf))
+    (are [v mv] (= v [(-> mv meta ::c/interceptors) (.-afn mv)])
       [[input.c/interceptor] input.c/event-db] (::input.c/event-db conf)
       [[input.c/interceptor] input.c/event-fx] (::input.c/event-fx conf))))
 
 (def ^:private config
-  {::c/module       nil
-   ::v/module       nil
+  {::c/module nil
+   ::v/module nil
    ::input.c/module nil})
 
 (deftest reg-test

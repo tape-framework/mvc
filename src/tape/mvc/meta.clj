@@ -50,20 +50,6 @@
         m'       (merge (:meta var-info) m)]
     [event-kw `(with-meta ~var-sym ~m')]))
 
-(defn ->kw-reg
-  "Given the metadata key `reg-key`, namespace string `ns-str`, extra metadata
-  `m` and the `var-info` of a var, returns a pair `[event-kw val]` to be used
-  in registration, where `val` is either a `var-sym` or a vector of extra input
-  and `var-sym`."
-  [reg-key ns-str m var-info]
-  (let [sym-name (-> var-info :name name)
-        input    (-> var-info :meta reg-key)
-        event-kw (keyword ns-str sym-name)
-        var-sym  (symbol sym-name)
-        val      (if input [input var-sym] var-sym)
-        m'       (merge (:meta var-info) m)]
-    [event-kw `(with-meta ~val ~m')]))
-
 (defn- add-nsp-meta [nsp-meta var-info]
   (update var-info :meta #(merge nsp-meta %)))
 

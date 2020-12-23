@@ -19,25 +19,17 @@
       (or (true? kval) (nil? kval)) id
       :else (throw (kval-ex id kind kval)))))
 
-(defn- get-handler [handler-or-args]
-  (cond
-    (fn? handler-or-args) handler-or-args
-    (coll? handler-or-args) (second handler-or-args)
-    :else (throw (ex-info "Bad argument" {}))))
-
 ;;; Subscriptions
 
-(defn- get-signals [handler-or-args]
-  (cond-> []
-          (coll? handler-or-args) (concat (first handler-or-args))))
+(defn- get-signals [handler]
+  (-> handler meta ::signals (or [])))
 
-(defn- reg-sub [frame [id handler-or-args]]
-  (let [id'     (get-id ::sub id handler-or-args)
-        handler (get-handler handler-or-args)
-        signals (get-signals handler-or-args)
+(defn- reg-sub [frame [id handler]]
+  (let [id'     (get-id ::sub id handler)
+        signals (get-signals handler)
         args    (conj (into [id'] signals) handler)]
     (apply rf/reg-sub args)
-    [id' handler-or-args]))
+    [id' handler]))
 
 (defn- clear-sub [frame [id _]]
   (rf/clear-sub id))
@@ -121,21 +113,19 @@
 
 ;;; Events Helpers
 
-(defn- get-interceptors [handler-or-args]
-  (cond-> []
-          (coll? handler-or-args) (conj (first handler-or-args))))
+(defn- get-interceptors [handler]
+  (-> handler meta ::interceptors (or [])))
 
 ;;; Events Fx
 
-(defn- reg-event-fx [config [id handler-or-args]]
+(defn- reg-event-fx [config [id handler]]
   (let [{:keys [frame views interceptor]} config
-        id'          (get-id ::event-fx id handler-or-args)
+        id'          (get-id ::event-fx id handler)
         has-view?    (some? (get views id'))
-        handler      (get-handler handler-or-args)
-        interceptors (cond-> (get-interceptors handler-or-args)
+        interceptors (cond-> (get-interceptors handler)
                              has-view? (conj interceptor))]
     (rf/reg-event-fx id' interceptors handler)
-    [id' handler-or-args]))
+    [id' handler]))
 
 (defn- clear-event [frame [id _]]
   (rf/clear-event id))
@@ -156,15 +146,14 @@
 
 ;;; Events Db
 
-(defn- reg-event-db [config [id handler-or-args]]
+(defn- reg-event-db [config [id handler]]
   (let [{:keys [frame views interceptor]} config
-        id'          (get-id ::event-db id handler-or-args)
+        id'          (get-id ::event-db id handler)
         has-view?    (some? (get views id'))
-        handler      (get-handler handler-or-args)
-        interceptors (cond-> (get-interceptors handler-or-args)
+        interceptors (cond-> (get-interceptors handler)
                              has-view? (conj interceptor))]
     (rf/reg-event-db id' interceptors handler)
-    [id' handler-or-args]))
+    [id' handler]))
 
 (defmethod ig/init-key ::events-db
   [_ {:keys [events-db] :as config}]
