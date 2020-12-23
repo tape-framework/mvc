@@ -19,10 +19,13 @@
       (or (true? kval) (nil? kval)) id
       :else (throw (kval-ex id kind kval)))))
 
-;;; Subscriptions
-
 (defn- get-signals [handler]
   (-> handler meta ::signals (or [])))
+
+(defn- get-interceptors [handler]
+  (-> handler meta ::interceptors (or [])))
+
+;;; Subscriptions
 
 (defn- reg-sub [frame [id handler]]
   (let [id'     (get-id ::sub id handler)
@@ -110,11 +113,6 @@
   (let [clear-cofx' (partial clear-cofx frame)]
     (run! clear-cofx' cofxs))
   config)
-
-;;; Events Helpers
-
-(defn- get-interceptors [handler]
-  (-> handler meta ::interceptors (or [])))
 
 ;;; Events Fx
 
