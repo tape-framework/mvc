@@ -11,17 +11,21 @@
 
 ;;; Helpers
 
-(defn- qualify [[k v]]
-  (let [nsp (-> v meta ::controller-ns-str)
-        kw  (keyword nsp (name k))]
-    [kw v]))
+(defn- with-controller-kw
+  "In the view registry, views are indexed by their coresponding controller
+  keywords (event names). This changes the key of a reg pair from the view ns
+  to the controller ns."
+  [[view-kw view]]
+  (let [controller-ns (-> view meta ::controller-ns-str)
+        controller-kw  (keyword controller-ns (name view-kw))]
+    [controller-kw view]))
 
 ;;; Integrant
 
 ;; Views registry; keys are in the controller namespace and values are Reagent
 ;; functions.
 (defmethod ig/init-key ::views [_ views]
-  (into {} (map qualify views)))
+  (into {} (map with-controller-kw views)))
 
 ;; Re-Frame subscription yielding the Reagent function set as `::current` in
 ;; app-db.
