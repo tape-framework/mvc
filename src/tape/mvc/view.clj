@@ -67,8 +67,8 @@
         module    (keyword ns-str "module")
         var-infos (vals (api/ns-publics ns-sym))
 
-        m         {::controller-ns-str co-ns-str}
-        collect   (partial meta/collect ns-meta var-infos m)
+        extra-meta {::controller-ns-str co-ns-str}
+        collect   (partial meta/collect ns-meta var-infos extra-meta)
         ->kw-var  (partial meta/->kw-var ns-str)
 
         views     (collect ::view ->kw-var)
