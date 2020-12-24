@@ -7,17 +7,17 @@
 
 ;;; Helpers
 
-(defn- kval-ex [id k kval]
-  (ex-info (str k " val must be true or a qualified keyword, but is " kval)
+(defn- key-ex [id kid]
+  (ex-info (str id " ::c/key must be a qualified keyword, but is " kid)
            {:id id
-            k kval}))
+            :kid kid}))
 
-(defn- get-id [kind id handler]
-  (let [kval (some-> handler meta kind)]
+(defn- get-id [id handler]
+  (let [kid (some-> handler meta ::id)]
     (cond
-      (qualified-keyword? kval) kval
-      (or (true? kval) (nil? kval)) id
-      :else (throw (kval-ex id kind kval)))))
+      (qualified-keyword? kid) kid
+      (nil? kid) id
+      :else (throw (key-ex id kid)))))
 
 (defn- get-signals [handler]
   (-> handler meta ::signals (or [])))
@@ -28,7 +28,7 @@
 ;;; Subscriptions
 
 (defn- reg-sub [frame [id handler]]
-  (let [id'     (get-id ::sub id handler)
+  (let [id'     (get-id id handler)
         signals (get-signals handler)
         args    (conj (into [id'] signals) handler)]
     (apply rf/reg-sub args)
@@ -53,7 +53,7 @@
 ;;; Raw Subscriptions
 
 (defn- reg-sub-raw [frame [id handler]]
-  (let [id' (get-id ::sub-raw id handler)]
+  (let [id' (get-id id handler)]
     (rf/reg-sub-raw id' handler)
     [id' handler]))
 
@@ -73,7 +73,7 @@
 ;;; Effects
 
 (defn- reg-fx [frame [id handler]]
-  (let [id' (get-id ::fx id handler)]
+  (let [id' (get-id id handler)]
     (rf/reg-fx id' handler)
     [id' handler]))
 
@@ -95,7 +95,7 @@
 ;;; Co-Effects
 
 (defn- reg-cofx [frame [id handler]]
-  (let [id' (get-id ::cofx id handler)]
+  (let [id' (get-id id handler)]
     (rf/reg-cofx id' handler)
     [id' handler]))
 
@@ -118,7 +118,7 @@
 
 (defn- reg-event-fx [config [id handler]]
   (let [{:keys [frame views interceptor]} config
-        id'          (get-id ::event-fx id handler)
+        id'          (get-id id handler)
         has-view?    (some? (get views id'))
         interceptors (cond-> (get-interceptors handler)
                              has-view? (conj interceptor))]
@@ -146,7 +146,7 @@
 
 (defn- reg-event-db [config [id handler]]
   (let [{:keys [frame views interceptor]} config
-        id'          (get-id ::event-db id handler)
+        id'          (get-id id handler)
         has-view?    (some? (get views id'))
         interceptors (cond-> (get-interceptors handler)
                              has-view? (conj interceptor))]

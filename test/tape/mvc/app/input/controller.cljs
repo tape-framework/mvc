@@ -3,7 +3,7 @@
             [re-frame.core :as rf]
             [tape.mvc.controller :as c :include-macros true]))
 
-(def ^::c/routes routes
+(def ^{::c/reg ::c/routes} routes
   ["/foo" ::foo])
 
 ;;; Input
@@ -21,22 +21,24 @@
 ;;; Reg-ables
 
 (defn sub
-  {::c/sub     true
+  {::c/reg ::c/sub
    ::c/signals [signal]}
   [db _query] (::x db))
 
 (defn subn
-  {::c/sub     ::sub-named
+  {::c/reg ::c/sub
+   ::c/id ::sub-named
    ::c/signals [signal]}
   [app-db _] (::x @app-db))
 
 (defn event-db
-  {::c/event-db     true
+  {::c/reg ::c/event-db
    ::c/interceptors [interceptor]}
   [_db [_ev-id _params]] {::x "x"})
 
 (defn event-fx
-  {::c/event-fx     ::event-fx-named
+  {::c/reg ::c/event-fx
+   ::c/id ::event-fx-named
    ::c/interceptors [interceptor]}
   [_cofx [_ev-id _params]] {:db {::x "X"}})
 

@@ -43,13 +43,13 @@
 
         collect      (partial meta/collect ns-meta var-infos {})
 
-        routes       (collect ::routes)
-        subs         (collect ::sub)
-        subs-raw     (collect ::sub-raw)
-        fxs          (collect ::fx)
-        cofxs        (collect ::cofx)
-        events-fx    (collect ::event-fx)
-        events-db    (collect ::event-db)
+        routes       (collect ::reg ::routes)
+        subs         (collect ::reg ::sub)
+        subs-raw     (collect ::reg ::sub-raw)
+        fxs          (collect ::reg ::fx)
+        cofxs        (collect ::reg ::cofx)
+        events-fx    (collect ::reg ::event-fx)
+        events-db    (collect ::reg ::event-db)
 
         routesd      (map (meta/->derive ::routes) routes)
         subsd        (map (meta/->derive ::sub) subs)

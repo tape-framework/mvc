@@ -58,7 +58,8 @@ little to no business logic for that UI piece.
 ##### Controllers
 
 The **controller** namespaces contain functions that can be registered in
-Re-Frame. Each fn that is to be registered is annotated with one of:
+Re-Frame. Each fn that is to be registered is annotated in metadata with
+`^{::c/reg <kind>}` where `<kind>` is one of:
 - `::c/sub` **subscription**
 - `::c/sub-raw` raw subscription
 - `::c/fx` effect handler
@@ -77,14 +78,20 @@ and can be used to:
 - add interceptors to all event handlers in a namespace,
 - or a signal to all subscriptions in the namespace.
 
+Function metadata directives override namespace metadata ones.
+
 ```clojure
 (ns blog.app.greet.controller
   (:require [tape.mvc.controller :as c :include-macros true]))
 
-(defn ^::c/event-db hello [_db [_ev-id _params]]
+(defn hello
+  {::c/reg ::c/event-db}
+  [_db [_ev-id _params]]
   {::say "Hello Tape MVC!"})
 
-(defn ^::c/sub say [db _query]
+(defn say
+  {::c/reg ::c/sub}
+  [db _query]
   (::say db))
 
 (c/defmodule)
@@ -100,18 +107,19 @@ Re-Frame. It is equivalent to:
 
 (defmethod ig/init-key ::module [_ _]
   (fn [config]
-    (module/merge-configs config {::hello hello
-                                  ::say say})))
+    (module/merge-configs config {::hello #'hello
+                                  ::say #'say})))
 ```
 
 Derived keys are collected by `tape.refmap` and registered in Re-Frame.
 
 ##### Views
 
-The **view** namespace contains Reagent functions. Some can be registered in the
-views map if they are annotated with:
+The **view** namespace contains Reagent functions. Some can be registered in
+the views map if they are annotated with:
 
-- `::v/view` if the function is to be registered in the views map
+- `^{::v/reg ::v/view}` if the function is to be registered in the views
+  registry map
 
 The key in the map will be based off the controller namespace, as to match an
 event (see naming conventions below) that can result in the view being set as
@@ -123,7 +131,9 @@ current `{::greet.c/hello greet.v/hello}`.
             [tape.mvc.view :as v :include-macros true]
             [blog.app.greet.controller :as greet.c]))
 
-(defn ^::v/view hello []
+(defn hello
+  {::v/reg ::v/view}
+  []
   (let [say @(rf/subscribe [::greet.c/say])]
     [:p say]))
 
@@ -132,8 +142,7 @@ current `{::greet.c/hello greet.v/hello}`.
 
 There is a `(v/defmodule)` call at the end that inspects the current namespace
 and defines a `tape.module` that will have the functions be registered in the
-views registry map. Note the argument that must be an unquoted symbol of the
-corresponding controller namespace, in full. It is equivalent to:
+views registry map. It is equivalent to:
                                                                           
 ```clojure
 (derive ::hello ::v/view)
@@ -142,7 +151,7 @@ corresponding controller namespace, in full. It is equivalent to:
   (fn [config]
     (module/merge-configs
      config
-     {::hello ^{::v/controller-ns-str "blog.app.greet.controller"} hello})))
+     {::hello ^{::v/controller-ns-str "blog.app.greet.controller"} #'hello})))
 ```
 
 Derived keys are collected by `tape.refmap` and registered in the view registry.

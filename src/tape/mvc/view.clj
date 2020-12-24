@@ -70,7 +70,7 @@
         extra-meta {::controller-ns-str co-ns-str}
         collect   (partial meta/collect ns-meta var-infos extra-meta)
 
-        views     (collect ::view)
+        views     (collect ::reg ::view)
         viewsd    (map (meta/->derive ::view) views)]
 
     `(do ~@viewsd

@@ -16,23 +16,26 @@
 
 (deftest collect-test
   (let [ns-meta {:x :a}
-        var-infos [{:name 'bar.baz/qux :meta {::c/sub true}}
-                   {:name 'bar.baz/quux :meta {::c/signals 'signals
-                                               ::c/sub :bar.baz/zub}}]
-        m {:y :b}
-        ->kw-var meta/->kw-var]
+        var-infos [{:name 'bar.baz/qux
+                    :meta {::c/reg ::c/sub}}
+                   {:name 'bar.baz/quux
+                    :meta {::c/reg ::c/sub
+                           ::c/sub :bar.baz/zub
+                           ::c/signals 'signals}}]
+        extra-meta {:y :b}]
     (is (= '#:bar.baz{:quux (clojure.core/with-meta
                              quux
-                             {:tape.mvc.controller/signals signals
+                             {:tape.mvc.controller/reg :tape.mvc.controller/sub
                               :tape.mvc.controller/sub :bar.baz/zub
+                              :tape.mvc.controller/signals signals
                               :x :a
                               :y :b})
                       :qux (clojure.core/with-meta
                             qux
-                            {:tape.mvc.controller/sub true
+                            {:tape.mvc.controller/reg :tape.mvc.controller/sub
                              :x :a
                              :y :b})}
-           (meta/collect ns-meta var-infos m ::c/sub ->kw-var)))))
+           (meta/collect ns-meta var-infos extra-meta ::c/reg ::c/sub)))))
 
 (deftest ->derive-test
   (let [f (meta/->derive ::foo)]

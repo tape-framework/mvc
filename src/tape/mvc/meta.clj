@@ -47,16 +47,16 @@
 (defn- add-nsp-meta [nsp-meta var-info]
   (update var-info :meta #(merge nsp-meta %)))
 
-(defn- has-meta? [pred-key var-info]
-  (-> var-info :meta pred-key some?))
+(defn- has-meta? [k v var-info]
+  (-> var-info :meta k (= v)))
 
 (defn collect
   "Given namespace metadata `ns-meta`, list of vars info `var-infos`,
   `extra-meta`data and metadata key `reg-kw` return of map of
   `{kw -> reg-data}` to be used in registration."
-  [ns-meta var-infos extra-meta reg-kw]
+  [ns-meta var-infos extra-meta reg-kw reg-val]
   (let [add-nsp-meta' (partial add-nsp-meta ns-meta)
-        pred          (partial has-meta? reg-kw)
+        pred          (partial has-meta? reg-kw reg-val)
         ->kw-var'     (partial ->kw-var extra-meta)]
     (->> var-infos (map add-nsp-meta') (filter pred) (map ->kw-var') (into {}))))
 
