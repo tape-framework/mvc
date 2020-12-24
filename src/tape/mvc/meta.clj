@@ -34,6 +34,14 @@
 
 ;;; Module
 
+(def ^:private meta-keys
+  [:tape.mvc.controller/reg
+   :tape.mvc.controller/id
+   :tape.mvc.controller/interceptors
+   :tape.mvc.controller/signals
+   :tape.mvc.view/reg
+   :tape.mvc.view/controller-ns-str])
+
 (defn ->kw-var
   "Given the `extra-meta`data, and the `var-info` of a var, returns a pair
   `[reg-key var-sym]` to be used in registration."
@@ -41,14 +49,15 @@
   (let [sym (-> var-info :name)
         reg-key (keyword sym)
         var-sym (-> sym name symbol)
-        extra-meta' (merge (:meta var-info) extra-meta)]
-    [reg-key `(with-meta ~var-sym ~extra-meta')]))
+        final-meta (-> (merge (:meta var-info) extra-meta)
+                       (select-keys meta-keys))]
+    [reg-key `(with-meta ~var-sym ~final-meta)]))
 
 (defn- add-nsp-meta [nsp-meta var-info]
   (update var-info :meta #(merge nsp-meta %)))
 
-(defn- has-meta? [k v var-info]
-  (-> var-info :meta k (= v)))
+(defn- has-meta? [reg-kw reg-val var-info]
+  (-> var-info :meta reg-kw (= reg-val)))
 
 (defn collect
   "Given namespace metadata `ns-meta`, list of vars info `var-infos`,
