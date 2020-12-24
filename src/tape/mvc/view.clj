@@ -41,7 +41,9 @@
               [tape.mvc.view :as v :include-macros true]
               [blog.app.greet.controller :as greet.c]))
 
-  (defn ^::v/view hello []
+  (defn hello
+    {::v/reg ::v/view}
+    []
     (let [say @(rf/subscribe [::greet.c/say])]
       [:p say]))
 
@@ -55,7 +57,7 @@
 
   (defmethod integrant.core/init-key ::module [_ _]
     (fn [config]
-      (tape.module/merge-configs config {::hello hello})))
+      (tape.module/merge-configs config {::hello #'hello})))
   ```
   "
   []

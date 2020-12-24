@@ -13,10 +13,14 @@
   (ns blog.app.greet.controller
     (:require [tape.mvc.controller :as c :include-macros true]))
 
-  (defn ^::c/event-db hello [_db [_ev-id _params]]
+  (defn hello
+    {::c/reg ::c/event-db}
+    [_db [_ev-id _params]]
     {::say \"Hello Tape MVC!\"})
 
-  (defn ^::c/sub say [db _query]
+  (defn say
+    {::c/reg ::c/sub}
+    [db _query]
     (::say db))
 
   (c/defmodule)
@@ -30,8 +34,8 @@
 
   (defmethod integrant.core/init-key ::module [_ _]
     (fn [config]
-      (tape.module/merge-configs config {::hello hello
-                                         ::say say})))
+      (tape.module/merge-configs config {::hello #'hello
+                                         ::say #'say})))
   ```
   "
   []
