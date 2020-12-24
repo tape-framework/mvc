@@ -4,23 +4,23 @@
             [tape.mvc.controller :as c]))
 
 (deftest ->kw-var-test
-  (let [m {::c/signals 'signals}
-        var-info {:name 'baz :meta {::c/sub true}}
-        var-info2 {:name 'baz :meta {::c/sub :foo.bar/qux}}]
+  (let [extra-meta {::c/signals 'signals}
+        var-info {:name 'foo.bar/baz :meta {::c/sub true}}
+        var-info2 {:name 'foo.bar/baz :meta {::c/sub :foo.bar/qux}}]
     (is (= [:foo.bar/baz '(clojure.core/with-meta baz {::c/signals signals
                                                        ::c/sub true})]
-           (meta/->kw-var "foo.bar" m var-info)))
+           (meta/->kw-var extra-meta var-info)))
     (is (= [:foo.bar/baz '(clojure.core/with-meta baz {::c/signals signals
                                                        ::c/sub :foo.bar/qux})]
-           (meta/->kw-var "foo.bar" m var-info2)))))
+           (meta/->kw-var extra-meta var-info2)))))
 
 (deftest collect-test
   (let [ns-meta {:x :a}
-        var-infos [{:name 'qux :meta {::c/sub true}}
-                   {:name 'quux :meta {::c/signals 'signals
-                                       ::c/sub :bar.baz/zub}}]
+        var-infos [{:name 'bar.baz/qux :meta {::c/sub true}}
+                   {:name 'bar.baz/quux :meta {::c/signals 'signals
+                                               ::c/sub :bar.baz/zub}}]
         m {:y :b}
-        ->kw-var (partial meta/->kw-var "bar.baz")]
+        ->kw-var meta/->kw-var]
     (is (= '#:bar.baz{:quux (clojure.core/with-meta
                              quux
                              {:tape.mvc.controller/signals signals

@@ -35,12 +35,12 @@
 ;;; Module
 
 (defn ->kw-var
-  "Given the namespace string `ns-str`, `extra-meta`data, and the `var-info`
-  of a var, returns a pair `[reg-key var-sym]` to be used in registration."
-  [ns-str extra-meta var-info]
-  (let [sym-name (-> var-info :name name)
-        reg-key (keyword ns-str sym-name)
-        var-sym  (symbol sym-name)
+  "Given the `extra-meta`data, and the `var-info` of a var, returns a pair
+  `[reg-key var-sym]` to be used in registration."
+  [extra-meta var-info]
+  (let [sym (-> var-info :name)
+        reg-key (keyword sym)
+        var-sym (-> sym name symbol)
         extra-meta' (merge (:meta var-info) extra-meta)]
     [reg-key `(with-meta ~var-sym ~extra-meta')]))
 
@@ -52,13 +52,13 @@
 
 (defn collect
   "Given namespace metadata `ns-meta`, list of vars info `var-infos`,
-  `extra-meta`dada, metadata key `reg-kw` and registration pair constructor
-  `->pair`, return of map of `{kw -> reg-data}` to be used in registration."
-  [ns-meta var-infos extra-meta reg-kw ->pair]
+  `extra-meta`data and metadata key `reg-kw` return of map of
+  `{kw -> reg-data}` to be used in registration."
+  [ns-meta var-infos extra-meta reg-kw]
   (let [add-nsp-meta' (partial add-nsp-meta ns-meta)
         pred          (partial has-meta? reg-kw)
-        ->pair'       (partial ->pair extra-meta)]
-    (->> var-infos (map add-nsp-meta') (filter pred) (map ->pair') (into {}))))
+        ->kw-var'     (partial ->kw-var extra-meta)]
+    (->> var-infos (map add-nsp-meta') (filter pred) (map ->kw-var') (into {}))))
 
 (defn ->derive
   "Returns a fn that derives a pair key `k` from `from`."

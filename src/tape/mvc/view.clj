@@ -69,9 +69,8 @@
 
         extra-meta {::controller-ns-str co-ns-str}
         collect   (partial meta/collect ns-meta var-infos extra-meta)
-        ->kw-var  (partial meta/->kw-var ns-str)
 
-        views     (collect ::view ->kw-var)
+        views     (collect ::view)
         viewsd    (map (meta/->derive ::view) views)]
 
     `(do ~@viewsd

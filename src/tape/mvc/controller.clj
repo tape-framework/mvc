@@ -42,15 +42,14 @@
         var-infos    (vals (api/ns-publics ns-sym))
 
         collect      (partial meta/collect ns-meta var-infos {})
-        ->kw-var     (partial meta/->kw-var ns-str)
 
-        routes       (collect ::routes ->kw-var)
-        subs         (collect ::sub ->kw-var)
-        subs-raw     (collect ::sub-raw ->kw-var)
-        fxs          (collect ::fx ->kw-var)
-        cofxs        (collect ::cofx ->kw-var)
-        events-fx    (collect ::event-fx ->kw-var)
-        events-db    (collect ::event-db ->kw-var)
+        routes       (collect ::routes)
+        subs         (collect ::sub)
+        subs-raw     (collect ::sub-raw)
+        fxs          (collect ::fx)
+        cofxs        (collect ::cofx)
+        events-fx    (collect ::event-fx)
+        events-db    (collect ::event-db)
 
         routesd      (map (meta/->derive ::routes) routes)
         subsd        (map (meta/->derive ::sub) subs)
