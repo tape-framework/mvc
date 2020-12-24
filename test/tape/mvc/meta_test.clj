@@ -1,17 +1,7 @@
 (ns tape.mvc.meta-test
   (:require [clojure.test :refer :all]
-            [cljs.analyzer.api :as api]
             [tape.mvc.meta :as meta]
             [tape.mvc.controller :as c]))
-
-(deftest ns-meta-test
-  (let [ns-name (with-meta 'my-ns {::c/signals 'signals
-                                   ::c/interceptors 'interceptors
-                                   :x 'a})]
-    (with-redefs [api/find-ns (constantly {:name ns-name})]
-      (is (= {::c/signals 'signals
-              ::c/interceptors 'interceptors}
-             (meta/ns-meta #'c/controller-ns? 'my-ns))))))
 
 (deftest ->kw-var-test
   (let [m {::c/signals 'signals}

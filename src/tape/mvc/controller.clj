@@ -4,8 +4,6 @@
             [tape.module :as module]
             [tape.mvc.meta :as meta]))
 
-(defn- controller-ns? [[k _]] (= "tape.mvc.controller" (namespace k)))
-
 (defmacro defmodule
   "Called at the end of controller namespaces, derives the handlers according
   to their metadata declaration, and defines a module that adds them to the
@@ -37,9 +35,9 @@
   ```
   "
   []
-  (let [ns-str       (str *ns*)
-        ns-sym       (symbol ns-str)
-        ns-meta      (meta/ns-meta controller-ns? ns-sym)
+  (let [ns-sym       (api/current-ns)
+        ns-str       (str ns-sym)
+        ns-meta      (-> ns-sym api/find-ns :name meta)
         module       (keyword ns-str "module")
         var-infos    (vals (api/ns-publics ns-sym))
 

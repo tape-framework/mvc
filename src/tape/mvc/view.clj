@@ -59,10 +59,11 @@
   ```
   "
   []
-  (let [ns-str    (str *ns*)
+  (let [ns-sym    (api/current-ns)
+        ns-str    (str ns-sym)
         co-ns-str (controller-ns-str ns-str)
-        ns-sym    (symbol ns-str)
-        ns-meta   (meta/ns-meta view-ns? ns-sym)
+
+        ns-meta   (-> ns-sym api/find-ns :name meta)
         module    (keyword ns-str "module")
         var-infos (vals (api/ns-publics ns-sym))
 

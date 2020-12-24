@@ -34,12 +34,6 @@
 
 ;;; Module
 
-(defn ns-meta
-  "Returns a map of meta data on the namespace `ns-sym` who'se pairs obey the
-  `ns-pred` predicate."
-  [ns-pred ns-sym]
-  (->> ns-sym api/find-ns :name meta (filter ns-pred) (into {})))
-
 (defn ->kw-var
   "Given the namespace string `ns-str`, extra metadata `m`, and the `var-info`
   of a var, returns a pair `[event-kw var-sym]` to be used in registration."
