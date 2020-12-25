@@ -42,34 +42,42 @@
    :tape.mvc.view/reg
    :tape.mvc.view/controller-ns-str])
 
-(defn ->kw-var
+(defn- ->kw-var
   "Given the `extra-meta`data, and the `var-info` of a var, returns a pair
   `[reg-key var-sym]` to be used in registration."
-  [extra-meta var-info]
+  [var-info]
   (let [sym (-> var-info :name)
         reg-key (keyword sym)
         var-sym (-> sym name symbol)
-        final-meta (-> (merge (:meta var-info) extra-meta)
-                       (select-keys meta-keys))]
+        final-meta (select-keys (:meta var-info) meta-keys)]
     [reg-key `(with-meta ~var-sym ~final-meta)]))
 
-(defn- add-nsp-meta [nsp-meta var-info]
-  (update var-info :meta #(merge nsp-meta %)))
+(defn- add-meta [extra-meta var-info]
+  (update var-info :meta #(merge extra-meta %)))
 
-(defn- has-meta? [reg-kw reg-val var-info]
-  (-> var-info :meta reg-kw (= reg-val)))
+(defn- has-meta? [reg-kw var-info]
+  (-> var-info :meta reg-kw some?))
 
-(defn collect
+(defn config
   "Given namespace metadata `ns-meta`, list of vars info `var-infos`,
   `extra-meta`data and metadata key `reg-kw` return of map of
   `{kw -> reg-data}` to be used in registration."
-  [ns-meta var-infos extra-meta reg-kw reg-val]
-  (let [add-nsp-meta' (partial add-nsp-meta ns-meta)
-        pred          (partial has-meta? reg-kw reg-val)
-        ->kw-var'     (partial ->kw-var extra-meta)]
-    (->> var-infos (map add-nsp-meta') (filter pred) (map ->kw-var') (into {}))))
+  [reg-kw extra-meta var-infos]
+  (->> var-infos
+       (filter (partial has-meta? reg-kw))
+       (map (partial add-meta extra-meta))
+       (map ->kw-var)
+       (into {})))
 
-(defn ->derive
-  "Returns a fn that derives a pair key `k` from `from`."
-  [from]
-  (fn [[k _]] (list `derive k from)))
+(defn- ->derive [reg-kw var-info]
+  (let [sym (-> var-info :name keyword)
+        reg-val (-> var-info :meta reg-kw)]
+    (when (qualified-keyword? reg-val)
+      (list `derive sym reg-val))))
+
+(defn derives
+  "Returns a form that derives a pair key `k` from `from`."
+  [reg-kw var-infos]
+  (->> var-infos
+       (filter (partial has-meta? reg-kw))
+       (keep (partial ->derive reg-kw))))

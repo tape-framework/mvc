@@ -34,37 +34,19 @@
 
   (defmethod integrant.core/init-key ::module [_ _]
     (fn [config]
-      (tape.module/merge-configs config {::hello #'hello
-                                         ::say #'say})))
+      (tape.module/merge-configs config {::hello hello
+                                         ::say say})))
   ```
   "
   []
-  (let [ns-sym       (api/current-ns)
-        ns-str       (str ns-sym)
-        ns-meta      (-> ns-sym api/find-ns :name meta)
-        module       (keyword ns-str "module")
-        var-infos    (vals (api/ns-publics ns-sym))
+  (let [ns-sym (api/current-ns)
+        ns-str (str ns-sym)
+        ns-meta (-> ns-sym api/find-ns :name meta)
+        module (keyword ns-str "module")
+        var-infos (vals (api/ns-publics ns-sym))
 
-        collect      (partial meta/collect ns-meta var-infos {})
-
-        routes       (collect ::reg ::routes)
-        subs         (collect ::reg ::sub)
-        subs-raw     (collect ::reg ::sub-raw)
-        fxs          (collect ::reg ::fx)
-        cofxs        (collect ::reg ::cofx)
-        events-fx    (collect ::reg ::event-fx)
-        events-db    (collect ::reg ::event-db)
-
-        routesd      (map (meta/->derive ::routes) routes)
-        subsd        (map (meta/->derive ::sub) subs)
-        subs-rawd    (map (meta/->derive ::sub-raw) subs-raw)
-        fxsd         (map (meta/->derive ::fx) fxs)
-        cofxsd       (map (meta/->derive ::cofx) cofxs)
-        events-fxd   (map (meta/->derive ::event-fx) events-fx)
-        events-dbd   (map (meta/->derive ::event-db) events-db)
-
-        derives      (concat routesd subsd subs-rawd fxsd cofxsd events-fxd events-dbd)
-        config       (merge routes subs subs-raw fxs cofxs events-fx events-db)]
+        config (meta/config ::reg ns-meta var-infos)
+        derives (meta/derives ::reg var-infos)]
 
     `(do ~@derives
          (defmethod ig/init-key ~module [_k# _v#]

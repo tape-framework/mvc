@@ -57,25 +57,21 @@
 
   (defmethod integrant.core/init-key ::module [_ _]
     (fn [config]
-      (tape.module/merge-configs config {::hello #'hello})))
+      (tape.module/merge-configs config {::hello hello})))
   ```
   "
   []
-  (let [ns-sym    (api/current-ns)
-        ns-str    (str ns-sym)
-        co-ns-str (controller-ns-str ns-str)
-
-        ns-meta   (-> ns-sym api/find-ns :name meta)
-        module    (keyword ns-str "module")
+  (let [ns-sym (api/current-ns)
+        ns-str (str ns-sym)
+        ns-meta (-> ns-sym api/find-ns :name meta)
+        module (keyword ns-str "module")
         var-infos (vals (api/ns-publics ns-sym))
 
-        extra-meta {::controller-ns-str co-ns-str}
-        collect   (partial meta/collect ns-meta var-infos extra-meta)
+        extra-meta {::controller-ns-str (controller-ns-str ns-str)}
+        config (meta/config ::reg (merge ns-meta extra-meta) var-infos)
+        derives (meta/derives ::reg var-infos)]
 
-        views     (collect ::reg ::view)
-        viewsd    (map (meta/->derive ::view) views)]
-
-    `(do ~@viewsd
+    `(do ~@derives
          (defmethod ig/init-key ~module [_k# _v#]
            (fn [config#]
-             (module/merge-configs config# ~views))))))
+             (module/merge-configs config# ~config))))))
