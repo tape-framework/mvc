@@ -107,8 +107,8 @@ Re-Frame. It is equivalent to:
 
 (defmethod ig/init-key ::module [_ _]
   (fn [config]
-    (module/merge-configs config {::hello #'hello
-                                  ::say #'say})))
+    (module/merge-configs config {::hello hello
+                                  ::say say})))
 ```
 
 Derived keys are collected by `tape.refmap` and registered in Re-Frame.
@@ -151,7 +151,7 @@ views registry map. It is equivalent to:
   (fn [config]
     (module/merge-configs
      config
-     {::hello ^{::v/controller-ns-str "blog.app.greet.controller"} #'hello})))
+     {::hello ^{::v/controller-ns-str "blog.app.greet.controller"} hello})))
 ```
 
 Derived keys are collected by `tape.refmap` and registered in the view registry.
