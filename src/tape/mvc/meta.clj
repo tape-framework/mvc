@@ -59,9 +59,9 @@
   (-> var-info :meta reg-kw some?))
 
 (defn config
-  "Given namespace metadata `ns-meta`, list of vars info `var-infos`,
-  `extra-meta`data and metadata key `reg-kw` return of map of
-  `{kw -> reg-data}` to be used in registration."
+  "Given metadata key `reg-kw`, `extra-meta`data, list of vars info
+  `var-infos`, return a map of `{id-kw -> reg-sym}` to be used in
+  registration."
   [reg-kw extra-meta var-infos]
   (->> var-infos
        (filter (partial has-meta? reg-kw))
@@ -76,7 +76,8 @@
       (list `derive sym reg-val))))
 
 (defn derives
-  "Returns a form that derives a pair key `k` from `from`."
+  "Returns a form that derives the handlers of var-infos according to their
+  metadata."
   [reg-kw var-infos]
   (->> var-infos
        (filter (partial has-meta? reg-kw))
