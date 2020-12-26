@@ -28,9 +28,9 @@
 ;;; Subscriptions
 
 (defn- reg-sub [frame [id handler]]
-  (let [id'     (get-id id handler)
+  (let [id' (get-id id handler)
         signals (get-signals handler)
-        args    (conj (into [id'] signals) handler)]
+        args (conj (into [id'] signals) handler)]
     (apply rf/reg-sub args)
     [id' handler]))
 
@@ -117,12 +117,12 @@
 ;;; Events Fx
 
 (defn- reg-event-fx [config [id handler]]
-  (let [{:keys [frame views interceptor]} config
-        id'          (get-id id handler)
-        has-view?    (some? (get views id'))
-        interceptors (cond-> (get-interceptors handler)
-                             has-view? (conj interceptor))]
-    (rf/reg-event-fx id' interceptors handler)
+  (let [{:keys [frame views interceptors]} config
+        id' (get-id id handler)
+        has-view? (some? (get views id'))
+        interceptors' (cond-> (get-interceptors handler)
+                              has-view? (into interceptors))]
+    (rf/reg-event-fx id' interceptors' handler)
     [id' handler]))
 
 (defn- clear-event [frame [id _]]
@@ -145,12 +145,12 @@
 ;;; Events Db
 
 (defn- reg-event-db [config [id handler]]
-  (let [{:keys [frame views interceptor]} config
-        id'          (get-id id handler)
-        has-view?    (some? (get views id'))
-        interceptors (cond-> (get-interceptors handler)
-                             has-view? (conj interceptor))]
-    (rf/reg-event-db id' interceptors handler)
+  (let [{:keys [frame views interceptors]} config
+        id' (get-id id handler)
+        has-view? (some? (get views id'))
+        interceptors' (cond-> (get-interceptors handler)
+                              has-view? (into interceptors))]
+    (rf/reg-event-db id' interceptors' handler)
     [id' handler]))
 
 (defmethod ig/init-key ::events-db
@@ -175,23 +175,23 @@
 ;;; Module
 
 (def ^:private default-config
-  {::frame     nil
-   ::subs      {:frame (ig/ref ::frame)
-                :subs  (refmap/refmap ::sub)}
-   ::subs-raw  {:frame    (ig/ref ::frame)
-                :subs-raw (refmap/refmap ::sub-raw)}
-   ::fxs       {:frame (ig/ref ::frame)
-                :fxs   (refmap/refmap ::fx)}
-   ::cofxs     {:frame (ig/ref ::frame)
-                :cofxs (refmap/refmap ::cofx)}
-   ::events-fx {:frame       (ig/ref ::frame)
-                :views       (ig/ref :tape.mvc.view/views)
-                :interceptor (ig/ref :tape.mvc.view/interceptor)
-                :events-fx   (refmap/refmap ::event-fx)}
-   ::events-db {:frame       (ig/ref ::frame)
-                :views       (ig/ref :tape.mvc.view/views)
-                :interceptor (ig/ref :tape.mvc.view/interceptor)
-                :events-db   (refmap/refmap ::event-db)}})
+  {::frame nil
+   ::subs {:frame (ig/ref ::frame)
+           :subs (refmap/refmap ::sub)}
+   ::subs-raw {:frame (ig/ref ::frame)
+               :subs-raw (refmap/refmap ::sub-raw)}
+   ::fxs {:frame (ig/ref ::frame)
+          :fxs (refmap/refmap ::fx)}
+   ::cofxs {:frame (ig/ref ::frame)
+            :cofxs (refmap/refmap ::cofx)}
+   ::events-fx {:frame (ig/ref ::frame)
+                :views (ig/ref :tape.mvc.view/views)
+                :interceptors (ig/refset :tape.current/view-interceptor)
+                :events-fx (refmap/refmap ::event-fx)}
+   ::events-db {:frame (ig/ref ::frame)
+                :views (ig/ref :tape.mvc.view/views)
+                :interceptors (ig/refset :tape.current/view-interceptor)
+                :events-db (refmap/refmap ::event-db)}})
 
 (defmethod ig/init-key ::module [_ conf]
   (fn [config]

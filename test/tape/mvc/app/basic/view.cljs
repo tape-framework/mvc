@@ -19,7 +19,10 @@
     [:h1 shout]))
 
 (defmethod ig/init-key ::extra [_ _]
-  (fn [] [:p "p"]))
+  (let [extra
+        ^{::v/controller-ns-str "tape.mvc.app.basic.controller"}
+        (fn [] [:p "p"])]
+    extra))
 
 ;;; Module
 

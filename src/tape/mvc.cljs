@@ -20,7 +20,4 @@
                      :events-fx   (ig/ref ::c/events-fx)
                      :events-db   (ig/ref ::c/events-db)
 
-                     :views       (ig/ref ::v/views)
-                     :interceptor (ig/ref ::v/interceptor)
-                     :current     (ig/ref ::v/current)
-                     :current-fn  (ig/ref ::v/current-fn)}})))
+                     :views       (ig/ref ::v/views)}})))

@@ -25,22 +25,6 @@
 
 (def ^:private views {::basic.c/event-db basic.v/hello})
 
-(deftest interceptor-test
-  (let [interceptor (ig/init-key ::v/interceptor views)
-        afterf      (:after interceptor)
-        context     {:coeffects {:event [::basic.c/event-db]}
-                     :effects   {:db {}}}
-        context2    (assoc-in context [:coeffects :event 0] ::basic.c/no-view)]
-    (is (= ::basic.c/event-db (-> context afterf (rf/get-effect :db) ::v/current)))
-    (is (nil? (-> context2 afterf (rf/get-effect :db) ::v/current)))))
-
-(deftest current-fn-test
-  (let [current-fn (ig/init-key ::v/current-fn views)
-        db         {::v/current ::basic.c/event-db}
-        db2        {}]
-    (is (= basic.v/hello (current-fn db nil)))
-    (is (= nil (current-fn db2 nil)))))
-
 (deftest derive-test
   (is (isa? ::basic.v/hello ::v/view)))
 

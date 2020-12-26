@@ -11,7 +11,4 @@
 
  :tape.mvc.view/view [:tape/const :tape/multi]
 
- :tape.mvc.view/current [:tape.mvc.controller/sub]
- :tape.mvc.view/current-fn [:tape.mvc.controller/sub]
-
  :tape.mvc/main [:tape/main]}
