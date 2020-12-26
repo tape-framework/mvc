@@ -156,6 +156,26 @@ views registry map. It is equivalent to:
 
 Derived keys are collected by `tape.refmap` and registered in the view registry.
 
+`defmodule` macros can also be called with a map argument that's merged in the
+module configuration output. This allows plain integrant components to be
+defined. It's more verbose than the plain function approach, but we can inject
+dependencies from the system map via `ig/ref` & such.
+
+```clojure
+(...)
+
+(defn hello
+  {::c/reg ::c/event-db}
+  [_db [_ev-id _params]]
+  {::say "Hello Tape MVC!"})
+
+(defmethod ig/init-key ::say [_ some-db]
+  (fn [_ _] (ratom/reaction (::something @some-db))))
+
+(derive ::say ::c/sub-raw)
+(c/defmodule {::say (ig/ref ::some-ns/some-db)})
+```
+
 ##### Modules system
 
 In `resources/blog/config.edn` declare your modules that will
