@@ -1,5 +1,7 @@
 (ns tape.mvc.app.input.controller
-  (:require [reagent.core :as r]
+  (:require [integrant.core :as ig]
+            [reagent.core :as r]
+            [reagent.ratom :as ratom :include-macros true]
             [re-frame.core :as rf]
             [tape.mvc.controller :as c :include-macros true]))
 
@@ -25,6 +27,13 @@
    ::c/signals [signal]}
   [db _query] (::x db))
 
+(defmethod ig/init-key ::sub-raw [_ _]
+  ;; Workaround for: https://ask.clojure.org/index.php/8975
+  (let [sub-raw
+        ^{::c/reg ::c/sub-raw}
+        (fn [_ _] (ratom/reaction (::x @db)))]
+    sub-raw))
+
 (defn subn
   {::c/reg ::c/sub
    ::c/id ::sub-named
@@ -44,4 +53,6 @@
 
 ;;; Module
 
-(c/defmodule)
+(derive ::sub-raw ::c/sub-raw)
+
+(c/defmodule {::sub-raw nil})

@@ -48,7 +48,8 @@
   (let [modulef (ig/init-key ::basic.v/module nil)
         conf    (modulef {})]
     (is (= #{::basic.v/hello
-             ::basic.v/goodbye}
+             ::basic.v/goodbye
+             ::basic.v/extra}
            (set (keys conf))))
     (are [f mf] (= f (.-afn mf))
       basic.v/hello (::basic.v/hello conf)

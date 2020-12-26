@@ -38,17 +38,19 @@
                                          ::say say})))
   ```
   "
-  []
-  (let [ns-sym (api/current-ns)
-        ns-str (str ns-sym)
-        ns-meta (-> ns-sym api/find-ns :name meta)
-        module (keyword ns-str "module")
-        var-infos (vals (api/ns-publics ns-sym))
+  ([]
+   `(defmodule {}))
+  ([conf]
+   (let [ns-sym (api/current-ns)
+         ns-str (str ns-sym)
+         ns-meta (-> ns-sym api/find-ns :name meta)
+         module (keyword ns-str "module")
+         var-infos (vals (api/ns-publics ns-sym))
 
-        config (meta/config ::reg ns-meta var-infos)
-        derives (meta/derives ::reg var-infos)]
+         config (meta/config ::reg ns-meta var-infos)
+         derives (meta/derives ::reg var-infos)]
 
-    `(do ~@derives
-         (defmethod ig/init-key ~module [_k# _v#]
-           (fn [config#]
-             (module/merge-configs config# ~config))))))
+     `(do ~@derives
+          (defmethod ig/init-key ~module [_k# _v#]
+            (fn [config#]
+              (module/merge-configs config# ~config ~conf)))))))

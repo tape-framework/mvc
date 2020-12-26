@@ -13,6 +13,7 @@
   (are [x y] (isa? x y)
     ::input.c/routes ::c/routes
     ::input.c/sub ::c/sub
+    ::input.c/sub-raw ::c/sub-raw
     ::input.c/subn ::c/sub
     ::input.c/event-db ::c/event-db
     ::input.c/event-fx ::c/event-fx))
@@ -22,6 +23,7 @@
         conf (f {})]
     (is (= #{::input.c/routes
              ::input.c/sub
+             ::input.c/sub-raw
              ::input.c/subn
              ::input.c/event-db
              ::input.c/event-fx}
@@ -42,6 +44,7 @@
   (let [system (-> config module/prep-config ig/init)]
     (are [kind id] (some? (registrar/get-handler kind id))
       :sub ::input.c/sub
+      :sub ::input.c/sub-raw
       :sub ::input.c/sub-named
       :event ::input.c/event-db
       :event ::input.c/event-fx-named)
