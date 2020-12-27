@@ -186,11 +186,13 @@
             :cofxs (refmap/refmap ::cofx)}
    ::events-fx {:frame (ig/ref ::frame)
                 :views (ig/ref :tape.mvc.view/views)
-                :interceptors (ig/refset :tape.current/view-interceptor)
+                :interceptors (ig/refset
+                               :tape.tools.current.controller/view-interceptor)
                 :events-fx (refmap/refmap ::event-fx)}
    ::events-db {:frame (ig/ref ::frame)
                 :views (ig/ref :tape.mvc.view/views)
-                :interceptors (ig/refset :tape.current/view-interceptor)
+                :interceptors (ig/refset
+                               :tape.tools.current.controller/view-interceptor)
                 :events-db (refmap/refmap ::event-db)}})
 
 (defmethod ig/init-key ::module [_ conf]
