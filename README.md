@@ -122,8 +122,8 @@ the views map if they are annotated with:
   registry map
 
 The key in the map will be based off the controller namespace, as to match an
-event (see naming conventions below) that can result in the view being set as
-current `{::greet.c/hello greet.v/hello}`.
+event (see naming conventions below) that can select a view; example:
+`{::greet.c/hello greet.v/hello}`.
 
 ```clojure
 (ns blog.app.greet.view
@@ -228,16 +228,12 @@ Note the exclusive use of namespaced keywords and the naming conventions:
   dispatches
 - the event with the id `::posts.c/index` which
 - is handled by the `posts.c/index` handler
-- and (potentially) renders the `posts.v/index` view
+- and (if `tape.current` is used) renders the `posts.v/index` view
   (if it exists, and the view was not already set from the handler)
-- by setting in app-db `{::v/current ::posts.c/index}`
+- by setting in app-db `{::current/view ::posts.c/index}`
   (automatically via the view interceptor, or manually in the event handler)
-- which results in the subscription `(rf/subscribe [::v/current-fn])`
+- which results in the subscription `(rf/subscribe [::current/view-fn])`
 - to yield the `posts.v/index` view fn
-
-The current view is automatically set in app-db by an interceptor if not set
-already from the event handler, if there exists a view corresponding to the
-event, per the naming convention.
 
 #### Ergonomic API
 
