@@ -9,18 +9,6 @@
 
 (module/load-hierarchy)
 
-;;; Ergonomics
-
-(deftest dispatch-test
-  (with-redefs [rf/dispatch identity]
-    (is (= [::basic.c/event-db]
-           (v/dispatch [basic.c/event-db])))))
-
-(deftest subscribe-test
-  (with-redefs [rf/subscribe identity]
-    (is (= [::basic.c/sub]
-           (v/subscribe [basic.c/sub])))))
-
 ;;; Module
 
 (def ^:private views {::basic.c/event-db basic.v/hello})

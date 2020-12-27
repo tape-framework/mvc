@@ -235,20 +235,6 @@ Note the exclusive use of namespaced keywords and the naming conventions:
 - which results in the subscription `(rf/subscribe [::current/view-fn])`
 - to yield the `posts.v/index` view fn
 
-#### Ergonomic API
-
-To allow IDE navigation, we have two macros that proxy to Re-Frame:
-
-```clojure
-(v/dispatch [posts.c/index]) ;; => (rf/dispatch [::posts.c/index])
-(v/subscribe [posts.c/posts]) ;; => (rf/subscribe [::posts.c/posts])
-```
-
-In their use, the macros accept events with a symbol form (that can be
-navigated via IDE), but once compiled, they are in the standard Re-Frame API
-with no performance penalty. Added vaue: the handler existance is checked at
-compile time, and typos are avoided.
-
 #### License
 
 Copyright © 2019 clyfe

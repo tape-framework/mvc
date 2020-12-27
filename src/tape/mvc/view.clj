@@ -5,26 +5,7 @@
             [tape.mvc.meta :as meta]
             [clojure.string :as string]))
 
-;;; Ergonomics
-
-(defmacro dispatch
-  "Like `re-frame.core/dispatch` but with  an IDE navigable symbol instead a
-  keyword. When compiled it replaces the symbol with the keyword. Example:
-  `(v/dispatch [counter.c/increment])
-  ; => (rf/subscribe [::counter.c/increment])`."
-  [[fsym & args]]
-  `(re-frame.core/dispatch ~(into [(meta/event-kw &env fsym)] args)))
-
-(defmacro subscribe
-  "Like `re-frame.core/subscribe` but with  an IDE navigable symbol instead a
-  keyword. When compiled it replaces the symbol with the keyword. Example:
-  `(v/subscribe [counter.c/count]) ; => (rf/subscribe [::counter.c/count])`."
-  [[fsym & args]]
-  `(re-frame.core/subscribe ~(into [(meta/sub-kw &env fsym)] args)))
-
 ;;; Module
-
-(defn- view-ns? [[k _]] (= "tape.mvc.view" (namespace k)))
 
 (defn- controller-ns-str [view-ns-str]
   (assert (re-find #".view$" view-ns-str) "Namespace must end in \".view\"!")
