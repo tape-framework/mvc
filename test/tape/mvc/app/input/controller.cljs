@@ -3,9 +3,9 @@
             [reagent.core :as r]
             [reagent.ratom :as ratom :include-macros true]
             [re-frame.core :as rf]
-            [tape.mvc.controller :as c :include-macros true]))
+            [tape.mvc :as mvc :include-macros true]))
 
-(def ^{::c/reg ::c/routes} routes
+(def ^{::mvc/reg ::mvc/routes} routes
   ["/foo" ::foo])
 
 ;;; Input
@@ -23,36 +23,36 @@
 ;;; Reg-ables
 
 (defn sub
-  {::c/reg ::c/sub
-   ::c/signals [signal]}
+  {::mvc/reg ::mvc/sub
+   ::mvc/signals [signal]}
   [db _query] (::x db))
 
 (defmethod ig/init-key ::sub-raw [_ _]
   ;; Workaround for: https://ask.clojure.org/index.php/8975
   (let [sub-raw
-        ^{::c/reg ::c/sub-raw}
+        ^{::mvc/reg ::mvc/sub-raw}
         (fn [_ _] (ratom/reaction (::x @db)))]
     sub-raw))
 
 (defn subn
-  {::c/reg ::c/sub
-   ::c/id ::sub-named
-   ::c/signals [signal]}
+  {::mvc/reg ::mvc/sub
+   ::mvc/id ::sub-named
+   ::mvc/signals [signal]}
   [app-db _] (::x @app-db))
 
 (defn event-db
-  {::c/reg ::c/event-db
-   ::c/interceptors [interceptor]}
+  {::mvc/reg ::mvc/event-db
+   ::mvc/interceptors [interceptor]}
   [_db [_ev-id _params]] {::x "x"})
 
 (defn event-fx
-  {::c/reg ::c/event-fx
-   ::c/id ::event-fx-named
-   ::c/interceptors [interceptor]}
+  {::mvc/reg ::mvc/event-fx
+   ::mvc/id ::event-fx-named
+   ::mvc/interceptors [interceptor]}
   [_cofx [_ev-id _params]] {:db {::x "X"}})
 
 ;;; Module
 
-(derive ::sub-raw ::c/sub-raw)
+(derive ::sub-raw ::mvc/sub-raw)
 
-(c/defmodule {::sub-raw nil})
+(mvc/defm ::module {::sub-raw nil})

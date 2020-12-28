@@ -1,38 +1,38 @@
 (ns tape.mvc.app.basic.controller
-  (:require [tape.mvc.controller :as c :include-macros true]))
+  (:require [tape.mvc :as mvc :include-macros true]))
 
-(def ^{::c/reg ::c/routes} routes
+(def ^{::mvc/reg ::mvc/routes} routes
   ["/" ::home
    "/event-db" ::event-db])
 
 (defn sub
-  {::c/reg ::c/sub}
+  {::mvc/reg ::mvc/sub}
   [db _query]
   (::x db))
 
 (defn sub-raw
-  {::c/reg ::c/sub-raw}
+  {::mvc/reg ::mvc/sub-raw}
   [app-db _]
   (::x @app-db))
 
 (defn fx
-  {::c/reg ::c/fx}
+  {::mvc/reg ::mvc/fx}
   [_m]
   (do "x"))
 
 (defn cofx
-  {::c/reg ::c/cofx}
+  {::mvc/reg ::mvc/cofx}
   [m]
   (assoc m ::x "x"))
 
 (defn event-db
-  {::c/reg ::c/event-db}
+  {::mvc/reg ::mvc/event-db}
   [_db [_ev-id _params]]
   {::x "x"})
 
 (defn event-fx
-  {::c/reg ::c/event-fx}
+  {::mvc/reg ::mvc/event-fx}
   [_cofx [_ev-id _params]]
   {:db {::x "X"}})
 
-(c/defmodule)
+(mvc/defm ::module)

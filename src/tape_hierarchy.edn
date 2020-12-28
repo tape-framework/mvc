@@ -1,14 +1,15 @@
-{:tape/multi [:tape/const]
+#:tape.mvc
+    {:tape/multi [:tape/const]
 
- :tape.mvc.controller/routes [:tape/const :tape/multi]
+     :routes [:tape/const :tape/multi]
 
- :tape.mvc.controller/sub [:tape/const :tape/multi]
- :tape.mvc.controller/sub-raw [:tape/const :tape/multi]
- :tape.mvc.controller/fx [:tape/const :tape/multi]
- :tape.mvc.controller/cofx [:tape/const :tape/multi]
- :tape.mvc.controller/event-fx [:tape/const :tape/multi]
- :tape.mvc.controller/event-db [:tape/const :tape/multi]
+     :sub [:tape/const :tape/multi]
+     :sub-raw [:tape/const :tape/multi]
+     :fx [:tape/const :tape/multi]
+     :cofx [:tape/const :tape/multi]
+     :event-fx [:tape/const :tape/multi]
+     :event-db [:tape/const :tape/multi]
 
- :tape.mvc.view/view [:tape/const :tape/multi]
+     :view [:tape/const :tape/multi]
 
- :tape.mvc/main [:tape/main]}
+     :main [:tape/main]}
