@@ -2,6 +2,7 @@
   (:require [clojure.set :as set]
             [cljs.test :refer [deftest testing is are]]
             [integrant.core :as ig]
+            [re-frame.core :as rf]
             [re-frame.registrar :as registrar]
             [tape.module :as module :include-macros true]
             [tape.mvc :as mvc :include-macros true]
@@ -11,6 +12,20 @@
             [tape.mvc.app.named.controller :as named.c]))
 
 (module/load-hierarchy)
+
+;;; Ergonomic API
+
+(deftest dispatch-test
+  (with-redefs [rf/dispatch identity]
+    (is (= [::basic.c/event-db]
+           (mvc/dispatch [basic.c/event-db])))))
+
+(deftest subscribe-test
+  (with-redefs [rf/subscribe identity]
+    (is (= [::basic.c/sub]
+           (mvc/subscribe [basic.c/sub])))))
+
+;;; Config
 
 (def ^:private config
   {::mvc/module nil

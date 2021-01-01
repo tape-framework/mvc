@@ -12,15 +12,14 @@
             [tape.module :as module])
   (:import [java.io File]))
 
-;;; Ergonomics
+;;; Ergonomic API
 
 (defn event-kw
   "Given a namespace qualified symbol of a tape event handler, returns the
   corresponding event keyword. Call from macro. Example:
   `(event-kw &env 'counter.c/increment) ; => ::counter.c/increment`."
   [env fsym]
-  (let [{:keys [ns name]
-         :tape.mvc.controller/keys [event-db event-fx]} (api/resolve env fsym)
+  (let [{:keys [ns name] ::keys [event-db event-fx]} (api/resolve env fsym)
         event (->> [event-db event-fx]
                    (filter qualified-keyword?)
                    first)]
@@ -34,12 +33,25 @@
   corresponding sumscription keyword. Call from macro. Example:
   `(sub-kw &env 'counter.c/count) ; => ::counter.c/count`."
   [env fsym]
-  (let [{:keys [ns name]
-         :tape.mvc.controller/keys [sub]} (api/resolve env fsym)]
+  (let [{:keys [ns name] ::keys [sub]} (api/resolve env fsym)]
     (cond
       (qualified-keyword? sub) sub
       (qualified-symbol? name) (keyword name)
       :else (keyword (str ns) (str name)))))
+
+(defmacro dispatch
+  "Like `re-frame.core/dispatch` but with  an IDE navigable symbol instead a
+  keyword. When compiled it replaces the symbol with the keyword. Example:
+  `(mvc/dispatch [counter.c/inc]) ; => (rf/subscribe [::counter.c/inc])`."
+  [[fsym & args]]
+  `(re-frame.core/dispatch ~(into [(event-kw &env fsym)] args)))
+
+(defmacro subscribe
+  "Like `re-frame.core/subscribe` but with  an IDE navigable symbol instead a
+  keyword. When compiled it replaces the symbol with the keyword. Example:
+  `(mvc/subscribe [counter.c/count]) ; => (rf/subscribe [::counter.c/count])`."
+  [[fsym & args]]
+  `(re-frame.core/subscribe ~(into [(sub-kw &env fsym)] args)))
 
 ;;; Meta
 

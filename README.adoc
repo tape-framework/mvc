@@ -187,7 +187,25 @@ dependencies from the system map via `ig/ref` & such.
 (mvc/defm ::module {::say (ig/ref ::some-ns/some-db)})
 ----
 
-##### Modules system
+==== Ergonomic API
+
+To allow IDE navigation, we have two macros that proxy to Re-Frame:
+
+[source,clojure]
+----
+(mvc/dispatch [posts.c/index])
+;; => (rf/dispatch [::posts.c/index])
+
+(mvc/subscribe [posts.c/posts])
+;; => (rf/subscribe [::posts.c/posts])
+----
+
+In their use, the macros accept events with a symbol form (that can be
+navigated via IDE), but once compiled, they are in the standard Re-Frame API
+with no performance penalty. Added value: the handler existence is checked at
+compile time, and typos are avoided.
+
+==== Modules system
 
 In `resources/blog/config.edn` declare your modules that will
 `tape.module/fold-modules` into your Integrant system's config-map:
