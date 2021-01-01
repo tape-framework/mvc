@@ -1,35 +1,36 @@
-## README
-
-STATUS: Pre-alpha, in design and prototyping phase.
-
-#### About
+== README
 
 `tape.mvc`
 
-An alternative interface to [Re-Frame](https://github.com/day8/re-frame/) 
-(and [Reagent](https://reagent-project.github.io/)) - via an
-[Integrant](https://github.com/weavejester/integrant) system built out of a
-`tape.module` system ([ported](https://github.com/duct-framework/core/) from
-Duct Framework).
+=== About
 
-#### Usage
+An alternative interface to https://github.com/day8/re-frame[Re-Frame]
+(and https://reagent-project.github.io[Reagent]) - via an
+https://github.com/weavejester/integrant[Integrant] system built out of a
+https://github.com/duct-framework/core/[tape.module] system (ported from
+https://github.com/duct-framework[Duct Framework]).
+
+=== Usage
 
 You must be familiar with Reagent, Re-Frame, Integrant, `tape.refmap` &
 `tape.module` before proceeding.
 
-##### Install
+==== Install
 
 Add `tape.mvc` to your deps:
 
-```clojure
-tape/mvc {:local/root "../mvc"}
-```
+.deps.edn
+[source,clojure]
+----
+{:deps {tape/mvc {:local/root "../mvc"}}}
+----
 
-##### Structure
+==== Structure
 
 Your project directory structure should be similar to:
 
-```
+[source,text]
+----
 blog
 ├── deps.edn
 ├── resources
@@ -47,42 +48,47 @@ blog
                 ├── controller.cljs
                 ├── model.cljs
                 └── view.cljs
-```
+----
 
-Under `blog.app` you should have a package for each piece of your UI (users, 
-posts). Each of these will have a model, view and controller namespace (not 
+Under `blog.app` you should have a package for each piece of your UI (users,
+posts). Each of these will have a model, view and controller namespace (not
 necessarily all 3).
 
 The **model** is a normal namespace, and is likely to be missing if you have
 little to no business logic for that UI piece.
 
-##### Controllers
+==== Controllers
 
 The **controller** namespaces contain functions that can be registered in
 Re-Frame. Each fn that is to be registered is annotated in metadata with
 `^{::mvc/reg <kind>}` where `<kind>` is one of:
+
+- `::mvc/event-fx` **event handler** with co/effect i/o
+- `::mvc/event-db` **event handler** with app-db i/o
 - `::mvc/sub` **subscription**
 - `::mvc/sub-raw` raw subscription
 - `::mvc/fx` effect handler
 - `::mvc/cofx` coeffect handler
-- `::mvc/event-fx` **event handler** with co/effect i/o
-- `::mvc/event-db` **event handler** with app-db i/o
 
 To provide interceptors to event handlers, or signals to subscriptions, use the
 following metadata:
+
 - `::mvc/interceptors` vector of symbols that evaluate to interceptors in the
-  current namespace
+current namespace
 - `::mvc/signals` vector of symbols that evaluate to signals in the current
-  namespace
+namespace
 
 Metadata at the namespace level is added to the functions that are registered,
 and can be used to:
+
 - add interceptors to all event handlers in a namespace,
 - or a signal to all subscriptions in the namespace.
 
 Function metadata directives override namespace metadata ones.
 
-```clojure
+.app/greet/controller.cljs
+[source,clojure]
+----
 (ns blog.app.greet.controller
   (:require [tape.mvc :as mvc :include-macros true]))
 
@@ -97,36 +103,39 @@ Function metadata directives override namespace metadata ones.
   (::say db))
 
 (mvc/defm ::module)
-```
+----
 
 There is a `(c/defm ::module)` call at the end that inspects the current
 namespace and defines a `tape.module` that will have the functions be registered
 in Re-Frame. It is equivalent to:
 
-```clojure
+[source,clojure]
+----
 (derive ::hello ::mvc/event-db)
 (derive ::say ::mvc/sub)
 
 (defmethod ig/init-key ::module [_ _]
   (fn [config]
     (module/merge-configs config {::hello hello, ::say say})))
-```
+----
 
 Derived keys are collected by `tape.refmap` and registered in Re-Frame.
 
-##### Views
+==== Views
 
 The **view** namespace contains Reagent functions. Some can be registered in
 the views map if they are annotated with:
 
 - `^{::mvc/reg ::mvc/view}` if the function is to be registered in the views
-  registry map
+registry map
 
 The key in the map will be based off the controller namespace, as to match an
 event (see naming conventions below) that can select a view; example:
 `{::greet.c/hello greet.v/hello}`.
 
-```clojure
+.app/greet/view.cljs
+[source,clojure]
+----
 (ns blog.app.greet.view
   (:require [re-frame.core :as rf]
             [tape.mvc :as mvc :include-macros true]
@@ -139,12 +148,12 @@ event (see naming conventions below) that can select a view; example:
     [:p say]))
 
 (mvc/defm ::module) ;; blog.app.greet.controller must exist
-```
+----
 
 There is a `(mvc/defm ::module)` call at the end that inspects the current
 namespace and defines a `tape.module` that will have the functions be registered
 in the views registry map. It is equivalent to:
-                                                                          
+
 ```clojure
 (derive ::hello ::mvc/view)
 
@@ -162,7 +171,8 @@ the module configuration output. This allows plain integrant components to be
 defined. It's more verbose than the plain function approach, but we can inject
 dependencies from the system map via `ig/ref` & such.
 
-```clojure
+[source,clojure]
+----
 (...)
 
 (defn hello
@@ -175,24 +185,28 @@ dependencies from the system map via `ig/ref` & such.
 
 (derive ::say ::mvc/sub-raw)
 (mvc/defm ::module {::say (ig/ref ::some-ns/some-db)})
-```
+----
 
 ##### Modules system
 
 In `resources/blog/config.edn` declare your modules that will
 `tape.module/fold-modules` into your Integrant system's config-map:
 
-```edn
+.resources/myapp/config.edn
+[source,clojure]
+----
 {:tape.profile/base {}
  :tape.mvc/module nil
  :blog.app.greet.controller/module nil
  :blog.app.greet.view/module nil}
-```
+----
 
 In `src/blog/core.cljs` you `tape.module/read-config` and
 `tape.module/exec-config` your Integrant system:
 
-```clojure
+.tape/blog.cljs
+[source,clojure]
+----
 (ns tape.blog
   (:require
    [goog.dom]
@@ -213,9 +227,9 @@ In `src/blog/core.cljs` you `tape.module/read-config` and
   (set! system (-> config module/prep-config ig/init))
   (rf/dispatch-sync [::greet.c/hello])
   (r/render-component [app] (goog.dom/getElement "app")))
-```
+----
 
-##### Conventions
+==== Conventions
 
 Note naming convention on requires:
 
@@ -225,17 +239,17 @@ Note naming convention on requires:
 Note the exclusive use of namespaced keywords and the naming conventions:
 
 - (if `tape.router` is used) the route named `::posts.c/index`
-  dispatches
+dispatches
 - the event with the id `::posts.c/index` which
 - is handled by the `posts.c/index` handler
 - and (if `tape.current` is used) renders the `posts.v/index` view
-  (if it exists, and the view was not already set from the handler)
+(if it exists, and the view was not already set from the handler)
 - by setting in app-db `{::current.c/view ::posts.c/index}`
-  (automatically via the view interceptor, or manually in the event handler)
+(automatically via the view interceptor, or manually in the event handler)
 - which results in the subscription `(rf/subscribe [::current.c/view-fn])`
 - to yield the `posts.v/index` view fn
 
-#### License
+=== License
 
 Copyright © 2019 clyfe
 
