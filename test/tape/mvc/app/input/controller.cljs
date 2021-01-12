@@ -53,6 +53,5 @@
 
 ;;; Module
 
-(derive ::sub-raw ::mvc/sub-raw)
-
-(mvc/defm ::module {::sub-raw nil})
+(prefer-method ig/init-key ::sub-raw :tape/const)
+(mvc/defm ::module {[::sub-raw ::mvc/sub-raw] nil})

@@ -26,6 +26,5 @@
 
 ;;; Module
 
-(derive ::extra ::mvc/view)
-
-(mvc/defm ::module {::extra nil})
+(prefer-method ig/init-key ::extra :tape/const)
+(mvc/defm ::module {[::extra ::mvc/view] nil})

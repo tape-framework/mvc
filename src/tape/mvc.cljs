@@ -12,12 +12,13 @@
            {:id id
             :kid kid}))
 
-(defn- get-id [id handler]
-  (let [kid (some-> handler meta ::id)]
+(defn- get-id [idk handler]
+  (let [reg-id (some-> handler meta ::id)]
     (cond
-      (qualified-keyword? kid) kid
-      (nil? kid) id
-      :else (throw (key-ex id kid)))))
+      (qualified-keyword? reg-id) reg-id
+      (nil? reg-id) (cond-> idk
+                            (vector? idk) first)
+      :else (throw (key-ex idk reg-id)))))
 
 (defn- get-signals [handler]
   (-> handler meta ::signals (or [])))
@@ -29,9 +30,11 @@
   "In the view registry, views are indexed by their coresponding controller
   keywords (event names). This changes the key of a reg pair from the view ns
   to the controller ns."
-  [[view-kw view]]
+  [[viewk view]]
   (let [controller-ns (-> view meta ::controller-ns-str)
         _ (assert (some? controller-ns))
+        view-kw (cond-> viewk
+                        (vector? viewk) first)
         controller-kw (keyword controller-ns (name view-kw))]
     [controller-kw view]))
 

@@ -24,7 +24,6 @@
   (with-redefs [rf/subscribe identity]
     (is (= [::basic.c/sub]
            (mvc/subscribe [basic.c/sub])))))
-
 ;;; Config
 
 (def ^:private config
@@ -35,34 +34,6 @@
    ::named.c/module nil})
 
 ;;; Controller
-
-(deftest derive-test
-  (testing "basic"
-    (are [x y] (isa? x y)
-      ::basic.c/routes ::mvc/routes
-      ::basic.c/sub ::mvc/sub
-      ::basic.c/sub-raw ::mvc/sub-raw
-      ::basic.c/fx ::mvc/fx
-      ::basic.c/cofx ::mvc/cofx
-      ::basic.c/event-db ::mvc/event-db
-      ::basic.c/event-fx ::mvc/event-fx))
-  (testing "input"
-    (are [x y] (isa? x y)
-      ::input.c/routes ::mvc/routes
-      ::input.c/sub ::mvc/sub
-      ::input.c/sub-raw ::mvc/sub-raw
-      ::input.c/subn ::mvc/sub
-      ::input.c/event-db ::mvc/event-db
-      ::input.c/event-fx ::mvc/event-fx))
-  (testing "named"
-    (are [x y] (isa? x y)
-      ::named.c/sub ::mvc/sub
-      ::named.c/sub-raw ::mvc/sub-raw
-      ::named.c/fx ::mvc/fx
-      ::named.c/cofx ::mvc/cofx
-      ::named.c/event-db ::mvc/event-db
-      ::named.c/event-fx ::mvc/event-fx
-      ::named.c/fx-named ::mvc/event-fx)))
 
 (deftest module-test
   (let [system (-> config
@@ -82,60 +53,64 @@
              keys-set)))
       (testing "basic"
         (is (set/subset?
-             #{::basic.c/routes
-               ::basic.c/sub
-               ::basic.c/sub-raw
-               ::basic.c/fx
-               ::basic.c/cofx
-               ::basic.c/event-db
-               ::basic.c/event-fx}
+             #{[::basic.c/routes ::mvc/routes]
+               [::basic.c/sub ::mvc/sub]
+               [::basic.c/sub-raw ::mvc/sub-raw]
+               [::basic.c/fx ::mvc/fx]
+               [::basic.c/cofx ::mvc/cofx]
+               [::basic.c/event-db ::mvc/event-db]
+               [::basic.c/event-fx ::mvc/event-fx]}
              keys-set)))
       (testing "input"
         (is (set/subset?
-             #{::input.c/routes
-               ::input.c/sub
-               ::input.c/sub-raw
-               ::input.c/subn
-               ::input.c/event-db
-               ::input.c/event-fx}
+             #{[::input.c/routes ::mvc/routes]
+               [::input.c/sub ::mvc/sub]
+               [::input.c/sub-raw ::mvc/sub-raw]
+               [::input.c/subn ::mvc/sub]
+               [::input.c/event-db ::mvc/event-db]
+               [::input.c/event-fx ::mvc/event-fx]}
              keys-set)))
       (testing "named"
         (is (set/subset?
-             #{::named.c/sub
-               ::named.c/sub-raw
-               ::named.c/fx
-               ::named.c/cofx
-               ::named.c/event-db
-               ::named.c/event-fx
-               ::named.c/fx-named}
+             #{[::named.c/sub ::mvc/sub]
+               [::named.c/sub-raw ::mvc/sub-raw]
+               [::named.c/fx ::mvc/fx]
+               [::named.c/cofx ::mvc/cofx]
+               [::named.c/event-db ::mvc/event-db]
+               [::named.c/event-fx ::mvc/event-fx]
+               [::named.c/fx-named ::mvc/event-fx]}
              keys-set))))
 
     (testing "values"
       (testing "basic"
-        (is (= basic.c/routes (::basic.c/routes system)))
-        (are [f k] (= f (.-afn (k system)))
-          basic.c/sub ::basic.c/sub
-          basic.c/sub-raw ::basic.c/sub-raw
-          basic.c/fx ::basic.c/fx
-          basic.c/cofx ::basic.c/cofx
-          basic.c/event-db ::basic.c/event-db
-          basic.c/event-fx ::basic.c/event-fx))
+        (is (= basic.c/routes (get system [::basic.c/routes ::mvc/routes])))
+        (are [f k] (= f (.-afn (get system k)))
+          basic.c/sub [::basic.c/sub ::mvc/sub]
+          basic.c/sub-raw [::basic.c/sub-raw ::mvc/sub-raw]
+          basic.c/fx [::basic.c/fx ::mvc/fx]
+          basic.c/cofx [::basic.c/cofx ::mvc/cofx]
+          basic.c/event-db [::basic.c/event-db ::mvc/event-db]
+          basic.c/event-fx [::basic.c/event-fx ::mvc/event-fx]))
       (testing "input"
-        (are [v k] (= v [(-> system k meta ::mvc/signals) (.-afn (k system))])
-          [[input.c/signal] input.c/sub] ::input.c/sub
-          [[input.c/signal] input.c/subn] ::input.c/subn)
-        (are [v k] (= v [(-> system k meta ::mvc/interceptors) (.-afn (k system))])
-          [[input.c/interceptor] input.c/event-db] ::input.c/event-db
-          [[input.c/interceptor] input.c/event-fx] ::input.c/event-fx))
+        (are [v k] (= v [(-> (get system k) meta ::mvc/signals)
+                         (.-afn (get system k))])
+          [[input.c/signal] input.c/sub] [::input.c/sub ::mvc/sub]
+          [[input.c/signal] input.c/subn] [::input.c/subn ::mvc/sub])
+        (are [v k] (= v [(-> (get system k) meta ::mvc/interceptors)
+                         (.-afn (get system k))])
+          [[input.c/interceptor] input.c/event-db] [::input.c/event-db
+                                                    ::mvc/event-db]
+          [[input.c/interceptor] input.c/event-fx] [::input.c/event-fx
+                                                    ::mvc/event-fx]))
       (testing "named"
-        (are [f k] (= f (.-afn (k system)))
-          named.c/sub ::named.c/sub
-          named.c/sub-raw ::named.c/sub-raw
-          named.c/fx ::named.c/fx
-          named.c/cofx ::named.c/cofx
-          named.c/event-db ::named.c/event-db
-          named.c/event-fx ::named.c/event-fx
-          named.c/fx-named ::named.c/fx-named)))
+        (are [f k] (= f (.-afn (get system k)))
+          named.c/sub [::named.c/sub ::mvc/sub]
+          named.c/sub-raw [::named.c/sub-raw ::mvc/sub-raw]
+          named.c/fx [::named.c/fx ::mvc/fx]
+          named.c/cofx [::named.c/cofx ::mvc/cofx]
+          named.c/event-db [::named.c/event-db ::mvc/event-db]
+          named.c/event-fx [::named.c/event-fx ::mvc/event-fx]
+          named.c/fx-named [::named.c/fx-named ::mvc/event-fx])))
 
     (testing "reg"
       (testing "basic"
@@ -169,19 +144,16 @@
 
 (def ^:private views {::basic.c/event-db basic.v/hello})
 
-(deftest view-derive-test
-  (is (isa? ::basic.v/hello ::mvc/view)))
-
 (deftest view-module-test
   (let [modulef (ig/init-key ::basic.v/module nil)
         conf (modulef {})]
-    (is (= #{::basic.v/hello
-             ::basic.v/goodbye
-             ::basic.v/extra}
+    (is (= #{[::basic.v/hello ::mvc/view]
+             [::basic.v/goodbye ::mvc/view]
+             [::basic.v/extra ::mvc/view]}
            (set (keys conf))))
     (are [f mf] (= f (.-afn mf))
-      basic.v/hello (::basic.v/hello conf)
-      basic.v/goodbye (::basic.v/goodbye conf))))
+      basic.v/hello (get conf [::basic.v/hello ::mvc/view])
+      basic.v/goodbye (conf [::basic.v/goodbye ::mvc/view]))))
 
 ;;; Modules discovery
 

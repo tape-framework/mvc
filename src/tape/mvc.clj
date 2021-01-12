@@ -58,78 +58,54 @@
 (def ^:private meta-keys
   [::reg ::id ::interceptors ::signals ::controller-ns-str])
 
-(defn- ->kw-var
-  "Given the `extra-meta`data, and the `var-info` of a var, returns a pair
-  `[reg-key var-sym]` to be used in registration."
+(defn- ->pair
+  "Return a registration pair for the given var-info."
   [var-info]
-  (let [sym (-> var-info :name)
-        reg-key (keyword sym)
-        var-sym (-> sym name symbol)
+  (let [name-sym (-> var-info :name)
+        name-kw (keyword name-sym)
+        reg-val (-> var-info :meta ::reg)
+        local-sym (-> name-sym name symbol)
         final-meta (select-keys (:meta var-info) meta-keys)]
-    [reg-key `(with-meta ~var-sym ~final-meta)]))
-
-(defn- add-meta [extra-meta var-info]
-  (update var-info :meta #(merge extra-meta %)))
-
-(defn- has-meta? [reg-kw var-info]
-  (-> var-info :meta reg-kw some?))
+    [[name-kw reg-val] `(with-meta ~local-sym ~final-meta)]))
 
 (defn- config
-  "Given metadata key `reg-kw`, `extra-meta`data, list of vars info
-  `var-infos`, return a map of `{id-kw -> reg-sym}` to be used in
-  registration."
-  [reg-kw extra-meta var-infos]
+  "Returns the module map for the given `var-infos`, adding `extra-meta`data."
+  [extra-meta var-infos]
   (->> var-infos
-       (filter (partial has-meta? reg-kw))
-       (map (partial add-meta extra-meta))
-       (map ->kw-var)
+       (filter #(-> % :meta ::reg some?))
+       (map #(update % :meta (partial merge extra-meta)))
+       (map ->pair)
        (into {})))
-
-(defn- ->derive [reg-kw var-info]
-  (let [sym (-> var-info :name keyword)
-        reg-val (-> var-info :meta reg-kw)]
-    (when (qualified-keyword? reg-val)
-      (list `derive sym reg-val))))
-
-(defn- derives
-  "Returns a form that derives the handlers of var-infos according to their
-  metadata."
-  [reg-kw var-infos]
-  (->> var-infos
-       (filter (partial has-meta? reg-kw))
-       (keep (partial ->derive reg-kw))))
 
 ;;; Module data
 
-(defmulti module-data
-  (fn []
-    (-> (api/current-ns) str (string/split #"\.") last keyword)))
+(defmulti collect
+  (fn [] (-> (api/current-ns) str (string/split #"\.") last keyword)))
 
-(defmethod module-data :default []
-  (throw (ex-info "Must be a controller or view namespace" {})))
+(defmethod collect :default []
+  (throw (ex-info "Namespace name must end with '.controller' or '.view'"
+                  {:ex ::collect})))
 
-(defmethod module-data :controller []
+(defmethod collect :controller []
   (let [ns-sym (api/current-ns)
         ns-meta (-> ns-sym api/find-ns :name meta)
         var-infos (vals (api/ns-publics ns-sym))]
-    {:config (config ::reg ns-meta var-infos)
-     :derives (derives ::reg var-infos)}))
+    (config ns-meta var-infos)))
 
-(defmethod module-data :view []
+(defmethod collect :view []
   (let [ns-sym (api/current-ns)
         ns-meta (-> ns-sym api/find-ns :name meta)
         var-infos (vals (api/ns-publics ns-sym))
         extra-meta {::controller-ns-str (string/replace
                                          (str ns-sym) #".view$" ".controller")}]
-    {:config (config ::reg (merge ns-meta extra-meta) var-infos)
-     :derives (derives ::reg var-infos)}))
+    (config (merge ns-meta extra-meta) var-infos)))
 
 ;;; Defm
 
 (defmacro defm
-  "Called at the end of controller or view namespaces, derives the handlers or
-  views according to their metadata declaration, and defines a module that adds
-  them to the system config map.
+  "Called at the end of controller or view namespaces.
+  Collects `::reg` fns and defines a module that adds them to the system config
+  map.
 
   Controller example:
 
@@ -151,12 +127,10 @@
   The `defm` call above is equivalent to:
 
   ```clojure
-  (derive ::hello ::c/event-db)
-  (derive ::say ::c/sub)
-
-  (defmethod integrant.core/init-key ::module [_ _]
+  (defmethod ig/init-key ::module [_ _]
     (fn [config]
-      (tape.module/merge-configs config {::hello hello, ::say say})))
+      (module/merge-configs config {[::hello ::c/event-db] hello
+                                    [::say ::c/sub] say})))
   ```
 
   View example:
@@ -179,21 +153,17 @@
   The `defm` call above is equivalent to:
 
   ```clojure
-  (derive ::hello ::mvc/view)
-
-  (defmethod integrant.core/init-key ::module [_ _]
+  (defmethod ig/init-key ::module [_ _]
     (fn [config]
-      (tape.module/merge-configs config {::hello hello})))
+      (module/merge-configs config {[::hello ::mvc/view] hello})))
   ```
   "
   ([kw]
    `(defm ~kw {}))
   ([kw conf]
-   (let [{:keys [config derives]} (module-data)]
-     `(do ~@derives
-          (defmethod ig/init-key ~kw [_k# _v#]
-            (fn [config#]
-              (module/merge-configs config# ~config ~conf)))))))
+   `(defmethod ig/init-key ~kw [_k# _v#]
+      (fn [config#]
+        (module/merge-configs config# ~(collect) ~conf)))))
 
 ;;; Modules discovery
 
